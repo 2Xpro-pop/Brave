@@ -8,7 +8,7 @@
         x:Class="Counter.MainWindow"
         Title="Counter">
 
-    <Button Command="{brave:Set $Counter++}" Resources="{brave:InitResources '$Counter=10'}">
+    <Button Command="{brave:Execute $Counter++}" Resources="{brave:InitResources '$Counter=10'}">
         <TextBlock>
 			Counter : <Run Text="{DynamicResource $Counter}"/>
         </TextBlock>

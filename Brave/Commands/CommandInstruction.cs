@@ -7,4 +7,4 @@ namespace Brave.Commands;
 /// <summary>
 /// Instruction with an optional operand (index into ConstantPool).
 /// </summary>
-public readonly record struct CommandInstruction(CommandOpCode OpCode, int Operand = 0);
+public readonly record struct CommandInstruction(CommandOpCode OpCode, Arguments Arguments);

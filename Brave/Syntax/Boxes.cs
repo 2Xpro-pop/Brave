@@ -18,4 +18,31 @@ internal static class Boxes
     public static readonly object BoxedDouble0 = 0.0;
     public static readonly object BoxedDouble1 = 1.0;
     public static readonly object BoxedDoubleNeg1 = -1.0;
+
+
+    public static object Box(bool value) => value ? BoxedTrue : BoxedFalse;
+
+    public static object Box(int value)
+    {
+        return value switch
+        {
+            0 => BoxedInt0,
+            1 => BoxedInt1,
+            -1 => BoxedIntNeg1,
+            _ => value,
+        };
+    }
+
+    public static object Box(double value)
+    {
+        return value switch
+        {
+            0.0 => BoxedDouble0,
+            1.0 => BoxedDouble1,
+            -1.0 => BoxedDoubleNeg1,
+            _ => value,
+        };
+    }
+
+    public static object Box(object self) => self;
 }

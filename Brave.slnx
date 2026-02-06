@@ -2,6 +2,9 @@
   <Folder Name="/Samples/">
     <Project Path="Samples/Counter/Counter.csproj" Id="951aed15-5456-4f9f-bae1-9418f98dd36b" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Project Path="Brave.Avalonia/Brave.Avalonia.csproj" Id="27519af3-c444-44d9-aa93-cdb8c6c3de99" />
   <Project Path="Brave.Tests/Brave.Tests.csproj" Id="edecb948-978d-446a-850e-83c485cf03b6" />
   <Project Path="Brave/Brave.csproj" Id="ed6888eb-627d-436b-94d2-d54cacaa5f50" />

@@ -10,4 +10,9 @@ public interface IAbstractResources: IDictionary<object, object?>
     }
 
     public bool TryGetResource(object key, out object? value);
+
+    public object? Owner
+    {
+        get;
+    }
 }

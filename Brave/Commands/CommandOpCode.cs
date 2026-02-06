@@ -4,45 +4,58 @@ using System.Text;
 
 namespace Brave.Commands;
 
-/// <summary>High-level opcodes (no raw stack fiddling exposed to compiler).</summary>
+/// <summary>
+/// High-level opcodes (no raw stack fiddling exposed to compiler).
+/// </summary>
 public enum CommandOpCode : byte
 {
-    // ---- Special fast paths (superinstructions) ----
+    Push,
+    GetResource,
+    SetResource,
+    DirectSetResource,
 
-    /// <summary>Returns resources[key].</summary>
-    ReturnSelf,
+    PreIncrementResource,
+    PostIncrementResource,
 
-    /// <summary>resources[key] = parameter; return assigned value.</summary>
-    AssignSelfFromParameterReturn,
+    PreDecrementResource,
+    PostDecrementResource,
 
-    /// <summary>resources[key] = !((bool)resources[key]); return assigned value.</summary>
-    ToggleSelfBooleanReturn,
+    PushParameter,
+    PushSelf,
 
-    /// <summary>resources[key] = null; return null.</summary>
-    AssignSelfNullReturn,
+    // Unary
+    Negate,
+    LogicalNot,
+    BitwiseNot,
 
-    /// <summary>resources[key] = constant; return assigned value.</summary>
-    AssignSelfFromConstantReturn,
-
-    /// <summary>resources[key] = Convert(constant, selfType); return assigned value.</summary>
-    AssignSelfFromConstantConvertedToSelfTypeReturn,
-
-    // ---- Generic expression evaluation (still relatively high-level) ----
-    // You can keep these for complex expressions like "$A + 10 == $B".
-
-    LoadSelf,            // push resources[key]
-    LoadParameter,       // push parameter
-    LoadResourceConstKey,// push resources[constKey]
-    PushConstant,        // push constant
-    Not,
+    // Arithmetic
     Add,
     Subtract,
     Multiply,
     Divide,
+
+    // Logical (strict; no short-circuit yet)
+    LogicalAnd,
+    LogicalOr,
+
+    // Bitwise
+    BitwiseAnd,
+    BitwiseOr,
+    BitwiseXor,
+
+    // Comparison
     Equal,
+    NotEqual,
+    GreaterThan,
+    GreaterOrEqual,
+    LessThan,
+    LessOrEqual,
 
-    ConvertTopToSelfType,
+    // -------- Control Flow --------
+    Jump,
+    JumpIfFalse,
+    JumpIfTrue,
+    JumpIfNull,
 
-    StoreSelf,           // resources[key] = pop; push assigned value
-    Return,              // return top
+    JumpIfNotNull,
 }

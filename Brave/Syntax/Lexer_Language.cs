@@ -71,6 +71,95 @@ partial class Lexer
 
                 return SyntaxToken.CreateToken(SyntaxKind.SlashToken);
 
+            case '&':
+                AdvanceChar();
+
+                if (TryAdvance('&'))
+                {
+                    return SyntaxToken.CreateToken(SyntaxKind.AmpersandAmpersandToken);
+                }
+
+                if (TryAdvance('='))
+                {
+                    return SyntaxToken.CreateToken(SyntaxKind.AmpersandEqualsToken);
+                }
+
+                return SyntaxToken.CreateToken(SyntaxKind.AmpersandToken);
+
+            case '|':
+                AdvanceChar();
+
+                if (TryAdvance('|'))
+                {
+                    return SyntaxToken.CreateToken(SyntaxKind.BarBarToken);
+                }
+
+                if (TryAdvance('='))
+                {
+                    return SyntaxToken.CreateToken(SyntaxKind.BarEqualsToken);
+                }
+
+                return SyntaxToken.CreateToken(SyntaxKind.BarToken);
+
+            case '<':
+                AdvanceChar();
+
+                if (TryAdvance('<'))
+                {
+                    if (TryAdvance('='))
+                    {
+                        return SyntaxToken.CreateToken(SyntaxKind.LessLessEqualsToken);
+                    }
+
+                    return SyntaxToken.CreateToken(SyntaxKind.LessLessToken);
+                }
+
+                if (TryAdvance('='))
+                {
+                    return SyntaxToken.CreateToken(SyntaxKind.LessEqualsToken);
+                }
+
+                return SyntaxToken.CreateToken(SyntaxKind.LessToken);
+
+            case '>':
+                AdvanceChar();
+
+                if (TryAdvance('>'))
+                {
+                    if (TryAdvance('='))
+                    {
+                        return SyntaxToken.CreateToken(SyntaxKind.GreaterGreaterEqualsToken);
+                    }
+
+                    return SyntaxToken.CreateToken(SyntaxKind.GreaterGreaterToken);
+                }
+
+                if (TryAdvance('='))
+                {
+                    return SyntaxToken.CreateToken(SyntaxKind.GreaterEqualsToken);
+                }
+
+                return SyntaxToken.CreateToken(SyntaxKind.GreaterToken);
+
+            case '?':
+                AdvanceChar();
+
+                if (TryAdvance('?'))
+                {
+                    if (TryAdvance('='))
+                    {
+                        return SyntaxToken.CreateToken(SyntaxKind.QuestionQuestionEqualsToken);
+                    }
+
+                    return SyntaxToken.CreateToken(SyntaxKind.QuestionQuestionToken);
+                }
+
+                return SyntaxToken.CreateToken(SyntaxKind.QuestionToken);
+
+            case ':':
+                AdvanceChar();
+                return SyntaxToken.CreateToken(SyntaxKind.ColonToken);
+
             case ',':
                 AdvanceChar();
                 return SyntaxToken.CreateToken(SyntaxKind.CommaToken);

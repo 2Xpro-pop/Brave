@@ -43,6 +43,7 @@ public sealed class SyntaxToken
     {
         return kind switch
         {
+            SyntaxKind.DollarToken => "$",
             SyntaxKind.PlusToken => "+",
             SyntaxKind.MinusToken => "-",
             SyntaxKind.AsteriskToken => "*",
@@ -51,7 +52,6 @@ public sealed class SyntaxToken
             SyntaxKind.CloseParenToken => ")",
             SyntaxKind.SemicolonToken => ";",
             SyntaxKind.EqualsToken => "=",
-            SyntaxKind.DollarToken => "$",
             SyntaxKind.PlusPlusToken => "++",
             SyntaxKind.MinusMinusToken => "--",
             SyntaxKind.PlusEqualsToken => "+=",
@@ -68,10 +68,29 @@ public sealed class SyntaxToken
             SyntaxKind.EqualEqualToken => "==",
             SyntaxKind.ParameterKeyword => "parameter",
             SyntaxKind.AtToken => "@",
+            SyntaxKind.AmpersandToken => "&",
+            SyntaxKind.AmpersandEqualsToken => "&=",
+            SyntaxKind.AmpersandAmpersandToken => "&&",
+            SyntaxKind.BarToken => "|",
+            SyntaxKind.BarEqualsToken => "|=",
+            SyntaxKind.BarBarToken => "||",
+            SyntaxKind.LessToken => "<",
+            SyntaxKind.LessEqualsToken => "<=",
+            SyntaxKind.LessLessToken => "<<",
+            SyntaxKind.LessLessEqualsToken => "<<=",
+            SyntaxKind.GreaterToken => ">",
+            SyntaxKind.GreaterEqualsToken => ">=",
+            SyntaxKind.GreaterGreaterToken => ">>",
+            SyntaxKind.GreaterGreaterEqualsToken => ">>=",
+            SyntaxKind.QuestionToken => "?",
+            SyntaxKind.QuestionQuestionToken => "??",
+            SyntaxKind.QuestionQuestionEqualsToken => "??=",
+            SyntaxKind.ColonToken => ":",
 
             _ => throw new ArgumentOutOfRangeException(nameof(kind), $"No text for syntax kind {kind}"),
         };
     }
+
 
     private SyntaxToken()
     {

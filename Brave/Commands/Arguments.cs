@@ -1,10 +1,30 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Brave.Commands;
 
+public static class ArgumentsBuilder
+{
+    public static Arguments Create(ReadOnlySpan<object> args)
+    {
+        if (args.IsEmpty)
+        {
+            return Arguments.Empty;
+        }
+
+        if(args.Length == 1)
+        {
+            return new Arguments(args[0]);
+        }
+
+        return new Arguments(args.ToArray());
+    }
+}
+
+[CollectionBuilder(typeof(ArgumentsBuilder), nameof(ArgumentsBuilder.Create))]
 public readonly struct Arguments : IReadOnlyList<object>
 {
     public static readonly Arguments Empty = new(null);

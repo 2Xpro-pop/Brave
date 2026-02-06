@@ -46,6 +46,9 @@ public sealed class AvaloniaResources: IAbstractResources
         }
     }
 
+    public StyledElement Owner => _styledElement;
+    object? IAbstractResources.Owner => _styledElement;
+
     public bool TryGetResource(object key, out object? value)
     {
         return _resources.TryGetResource(key, null, out value);

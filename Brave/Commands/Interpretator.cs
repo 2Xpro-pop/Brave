@@ -8,7 +8,7 @@ namespace Brave.Commands;
 
 internal static class Interpretator
 {
-    public static void Execute(IAbstractResources resources, object parameter, ImmutableArray<CommandInstruction> commandInstructions)
+    public static void Execute(IAbstractResources resources, object? parameter, ImmutableArray<CommandInstruction> commandInstructions)
     {
         object? key = null;
         object? value = null;

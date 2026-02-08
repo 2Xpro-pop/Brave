@@ -2,12 +2,13 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
 
 namespace Brave.Syntax;
 
-internal sealed partial class Lexer: IDisposable
+internal sealed partial class Lexer : IDisposable
 {
     public const int MaxExpressionLength = 1024;
 
@@ -51,12 +52,34 @@ internal sealed partial class Lexer: IDisposable
             }
 
             var token = NextToken();
-            
+
             if (token != null)
             {
                 yield return token;
             }
         }
+    }
+
+    public ImmutableArray<SyntaxToken> LexToEndArray()
+    {
+        using var builder = ImmutableArrayBuilder<SyntaxToken>.Rent();
+        while (!IsAtEnd())
+        {
+            SkipWhitespace();
+            if (IsAtEnd())
+            {
+                break;
+            }
+
+            var token = NextToken();
+
+            if (token != null)
+            {
+                builder.Add(token);
+            }
+        }
+
+        return builder.ToImmutable();
     }
 
     private bool IsAtEnd()
@@ -172,7 +195,7 @@ internal sealed partial class Lexer: IDisposable
         _stringTable.Free();
         _stringBuilder.Free();
 
-        if(_identifierBuffer.Length == 64)
+        if (_identifierBuffer.Length == 64)
         {
             s_identifierPool.Free(_identifierBuffer);
         }

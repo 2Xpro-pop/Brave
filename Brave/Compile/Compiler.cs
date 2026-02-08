@@ -11,6 +11,23 @@ namespace Brave.Compile;
 
 public static class Compiler
 {
+    public static ImmutableArray<CommandInstruction> Compile(string expression, bool useDirectSetResource = false)
+    {
+        if(CompilerCache.TryGet(expression, useDirectSetResource, out var cached))
+        {
+            return cached;
+        }
+
+        using var lexer = new Lexer(expression);
+        var tokens = lexer.LexToEndArray();
+
+        var instructions = Compile(tokens, useDirectSetResource);
+
+        CompilerCache.Add(expression, useDirectSetResource, instructions);
+
+        return instructions;
+    }
+
     public static ImmutableArray<CommandInstruction> Compile(ImmutableArray<SyntaxToken> syntaxTokens, bool useDirectSetResource = false)
     {
         using var builder = ImmutableArrayBuilder<CommandInstruction>.Rent();

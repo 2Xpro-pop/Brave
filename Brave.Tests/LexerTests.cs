@@ -81,6 +81,7 @@ public class LexerTests
     {
         // chance to fail is test is ~ 1.16%
         // because we have 3 identificator which take cache with size is 256
+        // Run this test separately from other tests to avoid pollution of cache with other identifiers
 
         var tokens = LexAll("$Hello + $Hello + $Hello - $A * $B == $A - $B + 50 - 50");
 

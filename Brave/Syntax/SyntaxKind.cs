@@ -62,6 +62,9 @@ public enum SyntaxKind
     BangEqualsToken = 146,               // !=
     TildeToken = 147,                    // ~
     NullKeyword = 148,                   // null
+    TrueKeyword = 149,                   // true
+    FalseKeyword = 150,                  // false
+    SelfKeyword = 151,                   // self
 
-    LastWellKnownText = NullKeyword,
+    LastWellKnownText = SelfKeyword,
 }

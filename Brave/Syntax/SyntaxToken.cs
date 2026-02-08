@@ -91,6 +91,9 @@ public sealed class SyntaxToken
             SyntaxKind.BangEqualsToken => "!=",
             SyntaxKind.TildeToken => "~",
             SyntaxKind.NullKeyword => "null",
+            SyntaxKind.TrueKeyword => "true",
+            SyntaxKind.FalseKeyword => "false",
+            SyntaxKind.SelfKeyword => "self",
 
             _ => throw new ArgumentOutOfRangeException(nameof(kind), $"No text for syntax kind {kind}"),
         };
@@ -100,6 +103,16 @@ public sealed class SyntaxToken
     private SyntaxToken()
     {
         Text = null!;
+
+        if(Kind == SyntaxKind.TrueKeyword)
+        {
+            Value = true;
+        }
+
+        if(Kind == SyntaxKind.FalseKeyword)
+        {
+            Value = false;
+        }
     }
 
     public bool IsIdentifier => Kind == SyntaxKind.IdentifierToken;

@@ -492,14 +492,28 @@ public static class Compiler
 
         if (reader.IsCurrent(SyntaxKind.NullKeyword))
         {
-            var nullToken = reader.Consume(SyntaxKind.NullKeyword);
+            reader.Consume(SyntaxKind.NullKeyword);
             builder.Add(new CommandInstruction(CommandOpCode.Push, [null!]));
+            return;
+        }
+
+        if(reader.IsCurrent(SyntaxKind.TrueKeyword))
+        {
+            reader.Consume(SyntaxKind.TrueKeyword);
+            builder.Add(new CommandInstruction(CommandOpCode.Push, [true]));
+            return;
+        }
+
+        if(reader.IsCurrent(SyntaxKind.FalseKeyword))
+        {
+            reader.Consume(SyntaxKind.FalseKeyword);
+            builder.Add(new CommandInstruction(CommandOpCode.Push, [false]));
             return;
         }
 
         if (reader.TryConsume(SyntaxKind.DollarToken))
         {
-            var name = reader.ConsumeAny(SyntaxKind.IdentifierToken, SyntaxKind.ParameterKeyword);
+            var name = reader.ConsumeAny(SyntaxKind.IdentifierToken, SyntaxKind.ParameterKeyword, SyntaxKind.SelfKeyword);
 
             if (name.Kind == SyntaxKind.ParameterKeyword)
             {
@@ -507,7 +521,7 @@ public static class Compiler
                 return;
             }
 
-            if (name.Kind == SyntaxKind.IdentifierToken && name.Text == "self")
+            if (name.Kind == SyntaxKind.SelfKeyword)
             {
                 builder.Add(new CommandInstruction(CommandOpCode.PushSelf));
                 return;
@@ -535,24 +549,6 @@ public static class Compiler
         if (reader.IsCurrent(SyntaxKind.IdentifierToken))
         {
             var identifier = reader.Consume(SyntaxKind.IdentifierToken);
-
-            if (identifier.Text == "true")
-            {
-                builder.Add(new CommandInstruction(CommandOpCode.Push, [true]));
-                return;
-            }
-
-            if (identifier.Text == "false")
-            {
-                builder.Add(new CommandInstruction(CommandOpCode.Push, [false]));
-                return;
-            }
-
-            if (identifier.Text == "null")
-            {
-                builder.Add(new CommandInstruction(CommandOpCode.Push, [null!]));
-                return;
-            }
 
             // Fallback: treat bare identifiers as strings for now
             builder.Add(new CommandInstruction(CommandOpCode.Push, [identifier.Text]));

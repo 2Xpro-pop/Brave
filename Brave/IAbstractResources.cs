@@ -9,10 +9,12 @@ public interface IAbstractResources: IDictionary<object, object?>
         get;
     }
 
-    public bool TryGetResource(object key, out object? value);
-
     public object? Owner
     {
         get;
     }
+
+    public bool TryGetResource(object key, out object? value);
+
+    public IDisposable TrySubscribeToKeyOrResource(object key, Action onChanged);
 }

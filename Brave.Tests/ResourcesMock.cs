@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
 using System.Text;
 
 namespace Brave.Tests;
@@ -14,6 +15,50 @@ internal static class ResourcesMock
     {
         var backingDictionary = new Dictionary<object, object?>();
         var resources = Substitute.For<IAbstractResources>();
+
+        // key -> callbacks
+        var keySubscriptions = new Dictionary<object, List<Action>>();
+
+        void NotifyKey(object key)
+        {
+            if (keySubscriptions.TryGetValue(key, out var list))
+            {
+                var snapshot = list.ToArray();
+                for (var i = 0; i < snapshot.Length; i++)
+                {
+                    snapshot[i]();
+                }
+            }
+
+            resources.ResourceChanged += Raise.Event<Action>();
+        }
+
+        resources.TrySubscribeToKeyOrResource(Arg.Any<object>(), Arg.Any<Action>())
+            .Returns(callInfo =>
+            {
+                var key = callInfo.ArgAt<object>(0);
+                var onChanged = callInfo.ArgAt<Action>(1);
+
+                if (!keySubscriptions.TryGetValue(key, out var list))
+                {
+                    list = new List<Action>(capacity: 2);
+                    keySubscriptions[key] = list;
+                }
+
+                list.Add(onChanged);
+
+                return Disposable.Create(() =>
+                {
+                    if (keySubscriptions.TryGetValue(key, out var l))
+                    {
+                        l.Remove(onChanged);
+                        if (l.Count == 0)
+                        {
+                            keySubscriptions.Remove(key);
+                        }
+                    }
+                });
+            });
 
         resources.Owner.Returns(owner ?? new object());
         resources.Parent.Returns(parent);
@@ -35,7 +80,6 @@ internal static class ResourcesMock
             {
                 var key = callInfo.ArgAt<object>(0);
                 var success = backingDictionary.TryGetValue(key, out var value);
-
                 callInfo[1] = value;
                 return success;
             });
@@ -45,7 +89,6 @@ internal static class ResourcesMock
             {
                 var key = callInfo.ArgAt<object>(0);
                 var success = backingDictionary.TryGetValue(key, out var value);
-
                 callInfo[1] = value;
                 return success;
             });
@@ -61,34 +104,54 @@ internal static class ResourcesMock
             .When(r => r[Arg.Any<object>()] = Arg.Any<object?>())
             .Do(callInfo =>
             {
-                // set_Item(object key, object value) => both are object, must use ArgAt
                 var key = callInfo.ArgAt<object>(0);
                 var value = callInfo.ArgAt<object?>(1);
 
                 backingDictionary[key] = value;
+                NotifyKey(key);
             });
 
         resources
             .When(r => r.Add(Arg.Any<object>(), Arg.Any<object?>()))
             .Do(callInfo =>
             {
-                // Add(object key, object? value) => still ambiguous via Arg<object>()
                 var key = callInfo.ArgAt<object>(0);
                 var value = callInfo.ArgAt<object?>(1);
 
                 backingDictionary.Add(key, value);
+                NotifyKey(key);
             });
 
         resources.Remove(Arg.Any<object>())
             .Returns(callInfo =>
             {
                 var key = callInfo.ArgAt<object>(0);
-                return backingDictionary.Remove(key);
+                var removed = backingDictionary.Remove(key);
+
+                if (removed)
+                {
+                    NotifyKey(key);
+                }
+
+                return removed;
             });
 
         resources
             .When(r => r.Clear())
-            .Do(_ => backingDictionary.Clear());
+            .Do(_ =>
+            {
+                backingDictionary.Clear();
+                resources.ResourceChanged += Raise.Event<Action>();
+
+                foreach (var kv in keySubscriptions)
+                {
+                    var snapshot = kv.Value.ToArray();
+                    for (var i = 0; i < snapshot.Length; i++)
+                    {
+                        snapshot[i]();
+                    }
+                }
+            });
 
         resources
             .When(r => r.CopyTo(Arg.Any<KeyValuePair<object, object?>[]>(), Arg.Any<int>()))

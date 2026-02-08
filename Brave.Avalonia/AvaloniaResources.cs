@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Brave.Avalonia;
 
-public sealed class AvaloniaResources: IAbstractResources
+public sealed class AvaloniaResources : IAbstractResources
 {
     private readonly IResourceDictionary _resources;
     private readonly StyledElement _styledElement;
@@ -26,12 +26,12 @@ public sealed class AvaloniaResources: IAbstractResources
     {
         get
         {
-            if(field != null)
+            if (field != null)
             {
                 return field;
             }
 
-            if(_styledElement is Visual visual)
+            if (_styledElement is Visual visual)
             {
                 var parent = visual.GetVisualParent() ?? visual.GetLogicalParent();
 
@@ -46,6 +46,8 @@ public sealed class AvaloniaResources: IAbstractResources
         }
     }
 
+
+
     public StyledElement Owner => _styledElement;
     object? IAbstractResources.Owner => _styledElement;
 
@@ -54,12 +56,42 @@ public sealed class AvaloniaResources: IAbstractResources
         return _resources.TryGetResource(key, null, out value);
     }
 
+    public IDisposable TrySubscribeToKeyOrResource(object key, Action onChanged)
+    {
+        ResourceChanged += onChanged;
+        return new Subscription(this, onChanged);
+    }
+
+    private sealed class Subscription : IDisposable
+    {
+        private readonly AvaloniaResources _resources;
+        private readonly Action _action;
+
+        public Subscription(AvaloniaResources resources, Action action)
+        {
+            _resources = resources;
+            _action = action;
+        }
+
+        public void Dispose()
+        {
+            _resources.ResourceChanged -= _action;
+        }
+    }
+
     #region IDictionary Implementation
 
-    public object? this[object key] 
-    { 
+    public object? this[object key]
+    {
         get => _resources[key];
-        set => _resources[key] = value;
+        set
+        {
+            if (_resources[key] == value)
+            {
+                return;
+            }
+            _resources[key] = value;
+        }
     }
 
     public ICollection<object> Keys => _resources.Keys;
@@ -76,7 +108,7 @@ public sealed class AvaloniaResources: IAbstractResources
     public void Add(KeyValuePair<object, object?> item) =>
         _resources.Add(item.Key, item.Value);
 
-    public void Clear() => 
+    public void Clear() =>
         _resources.Clear();
 
     public bool Contains(KeyValuePair<object, object?> item) =>
@@ -91,7 +123,7 @@ public sealed class AvaloniaResources: IAbstractResources
     public IEnumerator<KeyValuePair<object, object?>> GetEnumerator() =>
          _resources.GetEnumerator();
 
-    public bool Remove(object key) => 
+    public bool Remove(object key) =>
         _resources.Remove(key);
 
     public bool Remove(KeyValuePair<object, object?> item) =>
@@ -104,6 +136,5 @@ public sealed class AvaloniaResources: IAbstractResources
     {
         return GetEnumerator();
     }
-
     #endregion
 }

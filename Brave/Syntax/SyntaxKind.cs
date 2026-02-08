@@ -57,6 +57,10 @@ public enum SyntaxKind
     QuestionQuestionToken = 141,         // ?=
     QuestionQuestionEqualsToken = 142,   // ??=
     ColonToken = 143,                    // :
+    CaretToken = 144,                    // ^
+    CaretEqualsToken = 145,              // ^=
+    BangEqualsToken = 146,               // !=
+    TildeToken = 147,                    // ~
 
-    LastWellKnownText = ColonToken,
+    LastWellKnownText = CaretEqualsToken,
 }

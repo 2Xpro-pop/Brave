@@ -284,8 +284,11 @@ public static class Compiler
     {
         ParseBitwiseAnd(ref reader, builder, useDirectSetResource);
 
-        // Add SyntaxKind.CaretToken if you introduce it in lexer/kinds
-        // while (reader.TryConsume(SyntaxKind.CaretToken)) { ... BitwiseXor ... }
+        while (reader.TryConsume(SyntaxKind.CaretToken)) 
+        {
+            ParseBitwiseAnd(ref reader, builder, useDirectSetResource);
+            builder.Add(new CommandInstruction(CommandOpCode.BitwiseXor));
+        }
     }
 
     private static void ParseBitwiseAnd(ref TokenReader reader, ImmutableArrayBuilder<CommandInstruction> builder, bool useDirectSetResource)
@@ -312,8 +315,12 @@ public static class Compiler
                 continue;
             }
 
-            // Add SyntaxKind.BangEqualsToken when you implement it in lexer/kinds
-            // if (reader.TryConsume(SyntaxKind.BangEqualsToken)) { ... NotEqual ... }
+            if (reader.TryConsume(SyntaxKind.BangEqualsToken))
+            {
+                ParseRelational(ref reader, builder, useDirectSetResource);
+                builder.Add(new CommandInstruction(CommandOpCode.NotEqual));
+                continue;
+            }
 
             break;
         }
@@ -456,8 +463,13 @@ public static class Compiler
             return;
         }
 
-        // ~expr (add SyntaxKind.TildeToken in lexer/kinds to support)
-        // if (reader.TryConsume(SyntaxKind.TildeToken)) { ... BitwiseNot ... }
+        // ~expr
+        if (reader.TryConsume(SyntaxKind.TildeToken))
+        {
+            ParseUnary(ref reader, builder, useDirectSetResource);
+            builder.Add(new CommandInstruction(CommandOpCode.BitwiseNot));
+            return;
+        }
 
         ParsePrimary(ref reader, builder, useDirectSetResource);
     }

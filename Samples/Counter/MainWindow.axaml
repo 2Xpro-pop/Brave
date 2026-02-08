@@ -9,7 +9,7 @@
 		x:Class="Counter.MainWindow"
 		Title="Counter">
 
-	<Button Command="{brave:Execute Expression='$Counter++;$Text=\'Counter:\' + $Counter'}" Resources="{brave:InitResources '$Counter=20*5; $Text=\'Counter: \'+$Counter '}">
+	<Button Command="{brave:Execute Expression='$Counter++;$Text=\'Counter:\' + $Counter'}" Resources="{brave:InitResources '$Counter=20 * 5 ^ 17 - 3; $Text=\'Counter: \' + $Counter '}">
 		<TextBlock Text="{DynamicResource $Text}"/>
 	</Button>
 

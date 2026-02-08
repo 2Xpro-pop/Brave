@@ -196,6 +196,12 @@ partial class Lexer
 
             case '!':
                 AdvanceChar();
+
+                if (TryAdvance('='))
+                {
+                    return SyntaxToken.CreateToken(SyntaxKind.BangEqualsToken);
+                }
+
                 return SyntaxToken.CreateToken(SyntaxKind.BangToken);
 
             case '[':
@@ -233,6 +239,20 @@ partial class Lexer
 
             case '\"':
                 return ParseString();
+
+            case '^':
+                AdvanceChar();
+
+                if(TryAdvance('='))
+                {
+                    return SyntaxToken.CreateToken(SyntaxKind.CaretEqualsToken);
+                }
+
+                return SyntaxToken.CreateToken(SyntaxKind.CaretToken);
+
+            case '~':
+                AdvanceChar();
+                return SyntaxToken.CreateToken(SyntaxKind.TildeToken);
 
             case >= '0' and <= '9':
                 return ScanNumericLiteral();

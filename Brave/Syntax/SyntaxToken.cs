@@ -86,6 +86,10 @@ public sealed class SyntaxToken
             SyntaxKind.QuestionQuestionToken => "??",
             SyntaxKind.QuestionQuestionEqualsToken => "??=",
             SyntaxKind.ColonToken => ":",
+            SyntaxKind.CaretToken => "^",
+            SyntaxKind.CaretEqualsToken => "^=",
+            SyntaxKind.BangEqualsToken => "!=",
+            SyntaxKind.TildeToken => "~",
 
             _ => throw new ArgumentOutOfRangeException(nameof(kind), $"No text for syntax kind {kind}"),
         };

@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Samples/">
+    <Project Path="Samples/Adder/Adder.csproj" Id="6f8a3d8e-5e17-4792-ad2a-42d6dd9d2bea" />
     <Project Path="Samples/Counter/Counter.csproj" Id="951aed15-5456-4f9f-bae1-9418f98dd36b" />
   </Folder>
   <Folder Name="/Solution Items/">

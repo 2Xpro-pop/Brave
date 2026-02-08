@@ -1,14 +1,36 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
+using Avalonia.Markup.Xaml.XamlIl.Runtime;
 using Avalonia.VisualTree;
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Brave.Avalonia;
 
 public sealed class AvaloniaResources : IAbstractResources
 {
+    public static AvaloniaResources GetFirstResources(IAvaloniaXamlIlParentStackProvider parentStackProvider, object owner)
+    {
+        if(owner is StyledElement styledElement)
+        {
+            return new AvaloniaResources(styledElement);
+        }
+
+        var parents = parentStackProvider.Parents.ToImmutableArray();
+
+        for (int i = parents.Length - 1; i >= 0; i--)
+        {
+            if (parents[i] is StyledElement styled)
+            {
+                return new AvaloniaResources(styled);
+            }
+        }
+
+        throw new NotSupportedException("No StyledElement found in the provided owner or parent stack to resolve Avalonia resources.");
+    }
+
     private readonly IResourceDictionary _resources;
     private readonly StyledElement _styledElement;
 

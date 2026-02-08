@@ -31,8 +31,6 @@ public sealed class ObservableExpression : IObservable<object?>, IDisposable
     private readonly ImmutableArray<CommandInstruction> _instructions;
     private readonly WatchingKeys _wathcingKeys;
 
-    private object? _value;
-
     public ObservableExpression(IAbstractResources resources, string expression): this(resources, Compiler.Compile(expression))
     {
     }
@@ -58,16 +56,53 @@ public sealed class ObservableExpression : IObservable<object?>, IDisposable
         }
 
         _disposables = disposables.ToImmutable();
+
+        Calculate();
+    }
+
+    public object? Value
+    {
+        get;
+        private set
+        {
+            var convertedValue = TargetConverter != null ? TargetConverter(value) : value;
+            if (field == convertedValue)
+            {
+                return;
+            }
+
+            field = convertedValue;
+            Notify(convertedValue);
+        }
+    }
+
+    public object? Parameter
+    {
+        get;
+        set
+        {
+            field = value;
+            Calculate();
+        }
+    }
+
+    public Func<object?, object?>? TargetConverter
+    {
+        get; 
+        set
+        {
+            field = value;
+
+            Value = TargetConverter != null ? TargetConverter(Value) : Value;
+        }
     }
 
     private void Calculate()
     {
-        _value = Interpretator.Execute(_resources, null, _instructions);
-
-        Notify(_value);
+        Value = Interpretator.Execute(_resources, Parameter, _instructions);
     }
 
-    private void Notify(object value)
+    private void Notify(object? value)
     {
         foreach(var observer in _observers)
         {
@@ -78,11 +113,14 @@ public sealed class ObservableExpression : IObservable<object?>, IDisposable
     public IDisposable Subscribe(IObserver<object?> observer)
     {
         _observers.Add(observer);
+        observer.OnNext(Value);
         return new Subscription(this, observer);
     }
 
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
+
         for (int i = 0; i < _observers.Count; i++)
         {
             var observer = _observers[i];
@@ -96,6 +134,11 @@ public sealed class ObservableExpression : IObservable<object?>, IDisposable
             var disposable = _disposables[i];
             disposable.Dispose();
         }
+    }
+
+    ~ObservableExpression()
+    {
+        Dispose();
     }
 
     private sealed class Subscription : IDisposable

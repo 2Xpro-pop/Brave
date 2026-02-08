@@ -490,6 +490,13 @@ public static class Compiler
             return;
         }
 
+        if (reader.IsCurrent(SyntaxKind.NullKeyword))
+        {
+            var nullToken = reader.Consume(SyntaxKind.NullKeyword);
+            builder.Add(new CommandInstruction(CommandOpCode.Push, [null!]));
+            return;
+        }
+
         if (reader.TryConsume(SyntaxKind.DollarToken))
         {
             var name = reader.ConsumeAny(SyntaxKind.IdentifierToken, SyntaxKind.ParameterKeyword);

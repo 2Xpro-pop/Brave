@@ -263,6 +263,11 @@ partial class Lexer
             return SyntaxToken.CreateToken(SyntaxKind.ParameterKeyword);
         }
 
+        if(TryAdvanceKeyword("null"))
+        {
+            return SyntaxToken.CreateToken(SyntaxKind.NullKeyword);
+        }
+
         return ScanIdentifier();
     }
 

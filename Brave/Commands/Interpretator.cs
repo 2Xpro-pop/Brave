@@ -1,4 +1,5 @@
-﻿using Brave.Syntax;
+﻿using Brave.Compile;
+using Brave.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -8,7 +9,16 @@ namespace Brave.Commands;
 
 internal static class Interpretator
 {
-    public static void Execute(IAbstractResources resources, object? parameter, ImmutableArray<CommandInstruction> commandInstructions)
+    public static readonly object Void = new();
+
+    public static object Execute(IAbstractResources resources, object? parameter, string expression, bool useDirectResources = false)
+    {
+        var instructions = Compiler.Compile(expression, useDirectResources);
+
+        return Execute(resources, parameter, instructions);
+    }
+
+    public static object Execute(IAbstractResources resources, object? parameter, ImmutableArray<CommandInstruction> commandInstructions)
     {
         object? key = null;
         object? value = null;
@@ -222,7 +232,7 @@ internal static class Interpretator
                 case CommandOpCode.Jump:
                     target = (int)arguments[0];
 
-                    if ((uint)(int)target >= (uint)commandInstructions.Length)
+                    if ((uint)(int)target > (uint)commandInstructions.Length)
                     {
                         throw new InvalidOperationException($"Jump target out of range: {target}");
                     }
@@ -304,6 +314,8 @@ internal static class Interpretator
             }
 
         }
+
+        return runtimeStack.Count > 0 ? runtimeStack.Pop()! : Void;
     }
 
     private static object Increment(object? value)

@@ -90,6 +90,7 @@ public sealed class SyntaxToken
             SyntaxKind.CaretEqualsToken => "^=",
             SyntaxKind.BangEqualsToken => "!=",
             SyntaxKind.TildeToken => "~",
+            SyntaxKind.NullKeyword => "null",
 
             _ => throw new ArgumentOutOfRangeException(nameof(kind), $"No text for syntax kind {kind}"),
         };

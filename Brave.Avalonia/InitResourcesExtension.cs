@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.XamlIl.Runtime;
 using Brave.Commands;
 using Brave.Compile;
 using System;

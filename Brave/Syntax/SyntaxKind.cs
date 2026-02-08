@@ -61,6 +61,7 @@ public enum SyntaxKind
     CaretEqualsToken = 145,              // ^=
     BangEqualsToken = 146,               // !=
     TildeToken = 147,                    // ~
+    NullKeyword = 148,                   // null
 
-    LastWellKnownText = CaretEqualsToken,
+    LastWellKnownText = NullKeyword,
 }

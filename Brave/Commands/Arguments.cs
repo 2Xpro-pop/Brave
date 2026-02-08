@@ -15,6 +15,11 @@ public static class ArgumentsBuilder
             return Arguments.Empty;
         }
 
+        if (args.Length == 1 && args[0] == null)
+        {
+            return new Arguments(Arguments.NullCollection);
+        }
+
         if(args.Length == 1)
         {
             return new Arguments(args[0]);
@@ -27,6 +32,8 @@ public static class ArgumentsBuilder
 [CollectionBuilder(typeof(ArgumentsBuilder), nameof(ArgumentsBuilder.Create))]
 public readonly struct Arguments : IReadOnlyList<object>
 {
+    public static readonly IReadOnlyCollection<object?> NullCollection = [null];
+
     public static readonly Arguments Empty = new(null);
 
     private readonly object? _args;
@@ -41,6 +48,11 @@ public readonly struct Arguments : IReadOnlyList<object>
         get
         {
             if (_args == null)
+            {
+                return 0;
+            }
+
+            if(_args == NullCollection)
             {
                 return 0;
             }
@@ -62,8 +74,13 @@ public readonly struct Arguments : IReadOnlyList<object>
             {
                 throw new IndexOutOfRangeException();
             }
-            
-            if(_args is System.Collections.IList list)
+
+            if(_args == NullCollection && index == 0)
+            {
+                return null!;
+            }
+
+            if (_args is System.Collections.IList list)
             {
                 return list[index]!;
             }

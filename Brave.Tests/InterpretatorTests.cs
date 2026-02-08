@@ -15,7 +15,7 @@ public sealed class InterpretatorTests
     [Test]
     public void Jump_Skips_Instruction()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -38,7 +38,7 @@ public sealed class InterpretatorTests
     public void Ternary_When_False_Chooses_ElseBranch()
     {
         // false ? "T" : "F"
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -59,7 +59,7 @@ public sealed class InterpretatorTests
     public void Ternary_When_True_Chooses_ThenBranch()
     {
         // true ? "T" : "F"
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -80,7 +80,7 @@ public sealed class InterpretatorTests
     public void Coalesce_When_Left_NotNull_Returns_Left()
     {
         // A ?? "fallback"
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         backingDictionary["A"] = "value";
@@ -102,7 +102,7 @@ public sealed class InterpretatorTests
     public void Coalesce_When_Left_Null_Returns_Fallback()
     {
         // A ?? "fallback"
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         backingDictionary["A"] = null;
@@ -124,7 +124,7 @@ public sealed class InterpretatorTests
     public void LogicalAnd_ShortCircuit_When_Left_False_DoesNotEvaluate_Right()
     {
         // left && right, but "right" has side effect: Hit = true
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -152,7 +152,7 @@ public sealed class InterpretatorTests
     public void LogicalOr_ShortCircuit_When_Left_True_DoesNotEvaluate_Right()
     {
         // left || right, but "right" has side effect: Hit = true
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -185,7 +185,7 @@ public sealed class InterpretatorTests
         var owner = new object();
         var parameter = new object();
 
-        var (resources, backingDictionary) = CreateResources(owner: owner);
+        var (resources, backingDictionary) = ResourcesMock.CreateResources(owner: owner);
 
         var commandInstructions = ImmutableArray.Create(
             new CommandInstruction(CommandOpCode.PushParameter),
@@ -207,10 +207,10 @@ public sealed class InterpretatorTests
     [Test]
     public void SetResource_Sets_To_Existing_Key_In_Parent()
     {
-        var (parent, parentBacking) = CreateResources();
+        var (parent, parentBacking) = ResourcesMock.CreateResources();
         parentBacking["A"] = 10;
 
-        var (resources, backingDictionary) = CreateResources(parent: parent);
+        var (resources, backingDictionary) = ResourcesMock.CreateResources(parent: parent);
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -230,7 +230,7 @@ public sealed class InterpretatorTests
     [Test]
     public void JumpIfNotNull_Jumps_When_Value_NotNull()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -255,7 +255,7 @@ public sealed class InterpretatorTests
     [Test]
     public void PreIncrementResource_Returns_Incremented_Value()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         backingDictionary["C"] = 10;
@@ -277,7 +277,7 @@ public sealed class InterpretatorTests
     [Test]
     public void PostIncrementResource_Returns_Old_Value()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         backingDictionary["C"] = 10;
@@ -299,7 +299,7 @@ public sealed class InterpretatorTests
     [Test]
     public void PreDecrementResource_Returns_Decremented_Value()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         backingDictionary["C"] = 10;
@@ -321,7 +321,7 @@ public sealed class InterpretatorTests
     [Test]
     public void PostDecrementResource_Returns_Old_Value()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         backingDictionary["C"] = 10;
@@ -343,7 +343,7 @@ public sealed class InterpretatorTests
     [Test]
     public void Unary_Negate_LogicalNot_BitwiseNot_Works()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -373,7 +373,7 @@ public sealed class InterpretatorTests
     [Test]
     public void Arithmetic_Add_Subtract_Multiply_Divide_Works()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -412,7 +412,7 @@ public sealed class InterpretatorTests
     [Test]
     public void Logical_Strict_And_Or_Works()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -439,7 +439,7 @@ public sealed class InterpretatorTests
     [Test]
     public void Bitwise_And_Or_Xor_Works()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -472,7 +472,7 @@ public sealed class InterpretatorTests
     [Test]
     public void Comparison_Operators_Work()
     {
-        var (resources, backingDictionary) = CreateResources();
+        var (resources, backingDictionary) = ResourcesMock.CreateResources();
         var parameter = new object();
 
         var commandInstructions = ImmutableArray.Create(
@@ -511,113 +511,12 @@ public sealed class InterpretatorTests
 
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(backingDictionary["Eq"], Is.EqualTo(true));
-            Assert.That(backingDictionary["Ne"], Is.EqualTo(true));
-            Assert.That(backingDictionary["Gt"], Is.EqualTo(true));
-            Assert.That(backingDictionary["Ge"], Is.EqualTo(true));
-            Assert.That(backingDictionary["Lt"], Is.EqualTo(true));
-            Assert.That(backingDictionary["Le"], Is.EqualTo(true));
+            Assert.That(backingDictionary["Eq"], Is.True);
+            Assert.That(backingDictionary["Ne"], Is.True);
+            Assert.That(backingDictionary["Gt"], Is.True);
+            Assert.That(backingDictionary["Ge"], Is.True);
+            Assert.That(backingDictionary["Lt"], Is.True);
+            Assert.That(backingDictionary["Le"], Is.True);
         }
-    }
-
-    private static (IAbstractResources Resources, Dictionary<object, object?> Backing) CreateResources(
-        object? owner = null,
-        IAbstractResources? parent = null)
-    {
-        var backingDictionary = new Dictionary<object, object?>();
-        var resources = Substitute.For<IAbstractResources>();
-
-        resources.Owner.Returns(owner ?? new object());
-        resources.Parent.Returns(parent);
-        resources.IsReadOnly.Returns(false);
-
-        resources.Count.Returns(_ => backingDictionary.Count);
-        resources.Keys.Returns(_ => backingDictionary.Keys);
-        resources.Values.Returns(_ => backingDictionary.Values);
-
-        resources.ContainsKey(Arg.Any<object>())
-            .Returns(callInfo =>
-            {
-                var key = callInfo.ArgAt<object>(0);
-                return backingDictionary.ContainsKey(key);
-            });
-
-        resources.TryGetValue(Arg.Any<object>(), out Arg.Any<object?>())
-            .Returns(callInfo =>
-            {
-                var key = callInfo.ArgAt<object>(0);
-                var success = backingDictionary.TryGetValue(key, out var value);
-
-                callInfo[1] = value;
-                return success;
-            });
-
-        resources.TryGetResource(Arg.Any<object>(), out Arg.Any<object?>())
-            .Returns(callInfo =>
-            {
-                var key = callInfo.ArgAt<object>(0);
-                var success = backingDictionary.TryGetValue(key, out var value);
-
-                callInfo[1] = value;
-                return success;
-            });
-
-        resources[Arg.Any<object>()]
-            .Returns(callInfo =>
-            {
-                var key = callInfo.ArgAt<object>(0);
-                return backingDictionary[key];
-            });
-
-        resources
-            .When(r => r[Arg.Any<object>()] = Arg.Any<object?>())
-            .Do(callInfo =>
-            {
-                // set_Item(object key, object value) => both are object, must use ArgAt
-                var key = callInfo.ArgAt<object>(0);
-                var value = callInfo.ArgAt<object?>(1);
-
-                backingDictionary[key] = value;
-            });
-
-        resources
-            .When(r => r.Add(Arg.Any<object>(), Arg.Any<object?>()))
-            .Do(callInfo =>
-            {
-                // Add(object key, object? value) => still ambiguous via Arg<object>()
-                var key = callInfo.ArgAt<object>(0);
-                var value = callInfo.ArgAt<object?>(1);
-
-                backingDictionary.Add(key, value);
-            });
-
-        resources.Remove(Arg.Any<object>())
-            .Returns(callInfo =>
-            {
-                var key = callInfo.ArgAt<object>(0);
-                return backingDictionary.Remove(key);
-            });
-
-        resources
-            .When(r => r.Clear())
-            .Do(_ => backingDictionary.Clear());
-
-        resources
-            .When(r => r.CopyTo(Arg.Any<KeyValuePair<object, object?>[]>(), Arg.Any<int>()))
-            .Do(callInfo =>
-            {
-                var array = callInfo.ArgAt<KeyValuePair<object, object?>[]>(0);
-                var arrayIndex = callInfo.ArgAt<int>(1);
-
-                ((IDictionary<object, object?>)backingDictionary).CopyTo(array, arrayIndex);
-            });
-
-        resources.GetEnumerator()
-            .Returns(_ => ((IDictionary<object, object?>)backingDictionary).GetEnumerator());
-
-        ((IEnumerable)resources).GetEnumerator()
-            .Returns(_ => ((IEnumerable)backingDictionary).GetEnumerator());
-
-        return (resources, backingDictionary);
     }
 }

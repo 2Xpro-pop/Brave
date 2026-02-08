@@ -40,6 +40,25 @@ internal sealed partial class Lexer: IDisposable
         _identifierLength = 0;
     }
 
+    public IEnumerable<SyntaxToken> LexToEnd()
+    {
+        while (!IsAtEnd())
+        {
+            SkipWhitespace();
+            if (IsAtEnd())
+            {
+                break;
+            }
+
+            var token = NextToken();
+            
+            if (token != null)
+            {
+                yield return token;
+            }
+        }
+    }
+
     private bool IsAtEnd()
         => _position >= _length;
 

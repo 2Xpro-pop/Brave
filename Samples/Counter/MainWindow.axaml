@@ -1,18 +1,16 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:brave="http://github.com/2Xpro-pop/Brave"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        HorizontalContentAlignment="Center"
-        VerticalContentAlignment="Center"
-        x:Class="Counter.MainWindow"
-        Title="Counter">
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:brave="http://github.com/2Xpro-pop/Brave"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		HorizontalContentAlignment="Center"
+		VerticalContentAlignment="Center"
+		x:Class="Counter.MainWindow"
+		Title="Counter">
 
-    <Button Command="{brave:Execute $Counter++}" Resources="{brave:InitResources '$Counter=10'}">
-        <TextBlock>
-			Counter : <Run Text="{DynamicResource $Counter}"/>
-        </TextBlock>
-    </Button>
+	<Button Command="{brave:Execute Expression='$Counter++;$Text=\'Counter:\' + $Counter'}" Resources="{brave:InitResources '$Counter=20*5; $Text=\'Counter: \'+$Counter '}">
+		<TextBlock Text="{DynamicResource $Text}"/>
+	</Button>
 
 </Window>

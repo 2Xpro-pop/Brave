@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Brave;
 
-internal sealed class TwoWayRBinding : IObservable<object>, IDisposable
+internal sealed class TwoWayRBinding : IObservable<object?>, IDisposable
 {
-    private readonly List<IObserver<object>> _subscribers = [];
+    private readonly List<IObserver<object?>> _subscribers = [];
 
     private readonly object _key;
-    private readonly IObservable<object> _source;
+    private readonly IObservable<object?> _source;
     private readonly IAbstractResources _resources;
-    private readonly IDisposable _disposable;
+    private readonly IDisposable _disposable1;
+    private readonly IDisposable _disposable2;
 
     public TwoWayRBinding(object key, IObservable<object?> source, IAbstractResources resources)
     {
@@ -19,7 +21,16 @@ internal sealed class TwoWayRBinding : IObservable<object>, IDisposable
         _source = source;
         _resources = resources;
 
-        _disposable = _source.Subscribe(new ValueObserver(this));
+        _disposable1 = _source.Subscribe(new ValueObserver(this));
+
+        Value = _resources.GetOrCreate(key);
+
+        _disposable2 = _resources.TrySubscribeToKeyOrResource(key, () =>
+        {
+            var value = _resources.GetOrCreate(key);
+
+            Value = value;
+        });
     }
 
     public object? Value
@@ -27,14 +38,12 @@ internal sealed class TwoWayRBinding : IObservable<object>, IDisposable
         get;
         set
         {
-            var convertedValue = TargetConverter != null ? TargetConverter(value) : value;
-
-            if (field == convertedValue)
+            if (field == value)
             {
                 return;
             }
 
-            field = convertedValue;
+            field = value;
 
             ValueChanged();
         }
@@ -50,9 +59,14 @@ internal sealed class TwoWayRBinding : IObservable<object>, IDisposable
         get; set;
     } 
 
-    public IDisposable Subscribe(IObserver<object> observer)
+    public IDisposable Subscribe(IObserver<object?> observer)
     {
         _subscribers.Add(observer);
+
+        var converted = TargetConverter is not null ? TargetConverter(Value) : Value;
+
+        observer.OnNext(converted);
+
         return new Subscription(this, observer);
     }
 
@@ -60,11 +74,13 @@ internal sealed class TwoWayRBinding : IObservable<object>, IDisposable
     {
         _resources.TrySetToExistingKey(_key, Value);
 
+        var convertedValue = TargetConverter is not null ? TargetConverter(Value) : Value;
+
         for (var i = 0; i < _subscribers.Count; i++)
         {
             var observer = _subscribers[i];
 
-            observer.OnNext(Value!);
+            observer.OnNext(convertedValue);
         }
     }
 
@@ -72,7 +88,8 @@ internal sealed class TwoWayRBinding : IObservable<object>, IDisposable
     {
         GC.SuppressFinalize(this);
 
-        _disposable.Dispose();
+        _disposable1.Dispose();
+        _disposable2.Dispose();
 
         for (var i = 0; i < _subscribers.Count; i++)
         {
@@ -92,9 +109,9 @@ internal sealed class TwoWayRBinding : IObservable<object>, IDisposable
     private sealed class Subscription : IDisposable
     {
         private readonly TwoWayRBinding _binding;
-        private readonly IObserver<object> _observer;
+        private readonly IObserver<object?> _observer;
 
-        public Subscription(TwoWayRBinding binding, IObserver<object> observer)
+        public Subscription(TwoWayRBinding binding, IObserver<object?> observer)
         {
             _binding = binding;
             _observer = observer;
@@ -113,17 +130,39 @@ internal sealed class TwoWayRBinding : IObservable<object>, IDisposable
         {
             _binding = binding;
         }
+
         public void OnCompleted()
         {
-            // Do nothing
         }
+
         public void OnError(Exception error)
         {
-            // Do nothing
         }
+
         public void OnNext(object? value)
         {
-            _binding.Value = value;
+            if(value == BraveConstants.UnsetValue)
+            {
+                return;
+            }
+
+            object? converted = null!;
+
+            if(_binding.SourceConverter is null)
+            {
+                var valueType = _binding.Value?.GetType();
+
+                if(valueType is not null)
+                {
+                    converted = BraveConstants.FrameworkConverter?.Invoke(value, valueType) ?? value;
+                }
+            }
+            else
+            {
+                converted = _binding.SourceConverter(value);
+            }
+
+            _binding.Value = converted;
         }
     }
 }

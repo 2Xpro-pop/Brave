@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using System;
+using Brave.Avalonia;
 
 namespace Adder;
 
@@ -16,6 +17,7 @@ internal class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            .UseBrave()
             .WithInterFont()
             .LogToTrace();
 }

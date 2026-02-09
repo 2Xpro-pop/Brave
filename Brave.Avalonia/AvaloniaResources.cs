@@ -40,6 +40,7 @@ public sealed class AvaloniaResources : IAbstractResources
         _resources = styledElement.Resources;
 
         _resources.OwnerChanged += (s, e) => ResourceChanged?.Invoke();
+        styledElement.ResourcesChanged += (s, e) => ResourceChanged?.Invoke();
     }
 
     public event Action? ResourceChanged;

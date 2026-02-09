@@ -65,14 +65,13 @@ public sealed class ObservableExpression : IObservable<object?>, IDisposable
         get;
         private set
         {
-            var convertedValue = TargetConverter != null ? TargetConverter(value) : value;
-            if (field == convertedValue)
+            if (field == value)
             {
                 return;
             }
 
-            field = convertedValue;
-            Notify(convertedValue);
+            field = value;
+            Notify(value);
         }
     }
 
@@ -88,12 +87,11 @@ public sealed class ObservableExpression : IObservable<object?>, IDisposable
 
     public Func<object?, object?>? TargetConverter
     {
-        get; 
+        get;
         set
         {
             field = value;
-
-            Value = TargetConverter != null ? TargetConverter(Value) : Value;
+            Calculate();
         }
     }
 
@@ -104,16 +102,19 @@ public sealed class ObservableExpression : IObservable<object?>, IDisposable
 
     private void Notify(object? value)
     {
-        foreach(var observer in _observers)
+        var converted = TargetConverter is not null ? TargetConverter(value) : value;
+
+        foreach (var observer in _observers)
         {
-            observer.OnNext(value);
+            observer.OnNext(converted);
         }
     }
 
     public IDisposable Subscribe(IObserver<object?> observer)
     {
         _observers.Add(observer);
-        observer.OnNext(Value);
+        var converted = TargetConverter is not null ? TargetConverter(Value) : Value;
+        observer.OnNext(converted);
         return new Subscription(this, observer);
     }
 

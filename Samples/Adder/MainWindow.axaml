@@ -6,7 +6,7 @@
 		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 		x:Class="Adder.MainWindow"
 		Title="Adder">
-	<StackPanel Resources="{brave:InitResources '$A = 2; $B = 11'}">
+	<StackPanel Resources="{brave:InitResources '$A = 2d; $B = 11'}">
 		<TextBox Text="{brave:RBinding $A}" />
 		<TextBox Text="{brave:RBinding $B}" />
 

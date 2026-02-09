@@ -155,6 +155,11 @@ internal sealed class TwoWayRBinding : IObservable<object?>, IDisposable
                 if(valueType is not null)
                 {
                     converted = BraveConstants.FrameworkConverter?.Invoke(value, valueType) ?? value;
+
+                    if(converted?.GetType().IsAssignableTo(valueType) != true)
+                    {
+                        converted = _binding.Value;
+                    }
                 }
             }
             else

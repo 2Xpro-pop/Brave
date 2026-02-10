@@ -52,6 +52,8 @@ public static class Compiler
         return builder.ToImmutable();
     }
 
+    private const string ReturnResourceKey = "$return";
+
     private static void ParseExpression(ref TokenReader reader, ImmutableArrayBuilder<CommandInstruction> builder, bool useDirectSetResource)
     {
         ParseAssignment(ref reader, builder, useDirectSetResource);
@@ -542,6 +544,27 @@ public static class Compiler
                 return;
             }
 
+            if (reader.TryConsume(SyntaxKind.OpenParenToken))
+            {
+                // $Resource()
+                if (reader.TryConsume(SyntaxKind.CloseParenToken))
+                {
+                    EmitInvokeResource(builder, key, null!);
+                    builder.Add(new CommandInstruction(CommandOpCode.GetResource, [ReturnResourceKey]));
+                    return;
+                }
+
+                // $Resource(<parameter expression>)
+                ParseExpression(ref reader, builder, useDirectSetResource);
+                reader.Consume(SyntaxKind.CloseParenToken);
+
+                EmitInvokeResource(builder, key, RuntimeStack.Indexes.Last);
+
+                // Invocation is an expression: it evaluates to $return
+                builder.Add(new CommandInstruction(CommandOpCode.GetResource, [ReturnResourceKey]));
+                return;
+            }
+
             builder.Add(new CommandInstruction(CommandOpCode.GetResource, [key]));
             return;
         }
@@ -556,6 +579,15 @@ public static class Compiler
         }
 
         throw new InvalidOperationException($"Unexpected token '{reader.Current?.Kind ?? SyntaxKind.None}' at '{reader.Current?.Text ?? "null"}'.");
+    }
+
+    private static void EmitInvokeResource(ImmutableArrayBuilder<CommandInstruction> builder, string resourceKey, object parameterSource)
+    {
+        // Expected runtime convention:
+        // - Execute target stored in resourceKey
+        // - If the invocation can produce a value, it must store it into "$return" (lowercase)
+        // - Compiler reads "$return" right after invocation to make call an expression.
+        builder.Add(new CommandInstruction(CommandOpCode.InvokeResource, [resourceKey, parameterSource]));
     }
 
     private static object? GetLiteralValue(SyntaxToken token)

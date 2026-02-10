@@ -23,6 +23,8 @@ public enum CommandOpCode : byte
     PushParameter,
     PushSelf,
 
+    InvokeResource,
+
     // Unary
     Negate,
     LogicalNot,

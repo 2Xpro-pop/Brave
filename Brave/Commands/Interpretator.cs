@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
+using System.Windows.Input;
 
 namespace Brave.Commands;
 
@@ -112,6 +113,21 @@ internal static class Interpretator
                     runtimeStack.Push(resources.Owner);
                     break;
 
+                case CommandOpCode.InvokeResource:
+                    key = arguments[0];
+                    value = runtimeStack.Pop();
+
+                    var command = resources.GetOrCreate(key);
+
+                    if (command is not ICommand cmd)
+                    {
+                        throw new InvalidOperationException($"Resource '{key}' is not a command.");
+                    }
+
+                    value = runtimeStack.PopOrReturn(value);
+
+                    cmd.Execute(value);
+                    break;
                 // -------- Unary --------
 
                 case CommandOpCode.Negate:

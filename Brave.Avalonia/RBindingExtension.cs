@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Data.Core;
@@ -21,6 +22,7 @@ public sealed class RBindingExtension
     public RBindingExtension()
     {
         Expression = null!;
+        IResourceDictionary
     }
 
     public RBindingExtension(string expression)

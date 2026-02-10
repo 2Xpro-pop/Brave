@@ -1,12 +1,15 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Markup.Xaml.XamlIl.Runtime;
 using Brave.Commands;
 using Brave.Compile;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net.WebSockets;
 using System.Text;
 using System.Windows.Input;
 
@@ -33,25 +36,46 @@ public sealed class ExecuteExtension
 
     public ICommand? ProvideValue(IServiceProvider serviceProvider)
     {
-        if (serviceProvider.GetService(typeof(IProvideValueTarget)) is not IProvideValueTarget provideValueTarget)
-        {
-            throw new InvalidOperationException("IProvideValueTarget service is not available.");
-        }
-
-        if (provideValueTarget.TargetObject is not StyledElement styled)
-        {
-            throw new InvalidOperationException("Target object is not a StyledElement.");
-        }
+        var styled = GetTargetObject(serviceProvider);
 
         if (Expression is null)
         {
             throw new InvalidOperationException("Expression cannot be null.");
         }
 
+        var metaInfoProvider = new MetaInfoProvider(serviceProvider);
+
         var resources = new AvaloniaResources(styled);
 
         var instructions = Compiler.Compile(Expression, useDirectSetResource: false);
 
-        return new CommandExecutor(resources, instructions);
+        return new CommandExecutor(resources, instructions, metaInfoProvider);
+    }
+
+    private static StyledElement GetTargetObject(IServiceProvider serviceProvider)
+    {
+
+        if (serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget provideValueTarget)
+        {
+            if (provideValueTarget.TargetObject is StyledElement styled)
+            {
+                return styled;
+            }
+        }
+
+        if(serviceProvider.GetService(typeof(IRootObjectProvider)) is IRootObjectProvider rootObjectProvider)
+        {
+            if (rootObjectProvider.RootObject is StyledElement styled)
+            {
+                return styled;
+            }
+
+            if(rootObjectProvider.IntermediateRootObject is StyledElement styledIntermediate)
+            {
+                return styledIntermediate;
+            }
+        }
+
+        throw new InvalidOperationException("Target or Root object is not a StyledElement.");
     }
 }

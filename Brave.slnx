@@ -2,6 +2,7 @@
   <Folder Name="/Samples/">
     <Project Path="Samples/Adder/Adder.csproj" Id="6f8a3d8e-5e17-4792-ad2a-42d6dd9d2bea" />
     <Project Path="Samples/Counter/Counter.csproj" Id="951aed15-5456-4f9f-bae1-9418f98dd36b" />
+    <Project Path="Samples/SampleGalery/SampleGalery.csproj" Id="dcdb3b5c-3366-4edb-80f2-ee7f54e8ec75" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />

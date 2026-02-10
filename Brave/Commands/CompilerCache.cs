@@ -9,7 +9,7 @@ namespace Brave.Commands;
 
 internal static class CompilerCache
 {
-    const int CacheSize = 8; // Keep this small
+    const int CacheSize = 16; // Keep this small
     const int CacheMask = CacheSize - 1;
 
     private static readonly Entry[] s_cache = new Entry[CacheSize];

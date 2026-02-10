@@ -7,15 +7,17 @@ using System.Windows.Input;
 
 namespace Brave.Commands;
 
-public sealed class CommandExecutor : ICommand
+internal sealed class CommandExecutor : ICommand
 {
     private readonly IAbstractResources _resources;
     private readonly ImmutableArray<CommandInstruction> _commandInstructions;
+    private readonly IMetaInfoProvider _metaInfoProvider;
 
-    public CommandExecutor(IAbstractResources resources, ImmutableArray<CommandInstruction> commandInstructions)
+    internal CommandExecutor(IAbstractResources resources, ImmutableArray<CommandInstruction> commandInstructions, IMetaInfoProvider metaInfoProvider)
     {
         _resources = resources;
         _commandInstructions = commandInstructions;
+        _metaInfoProvider = metaInfoProvider;
     }
 
     public event EventHandler? CanExecuteChanged

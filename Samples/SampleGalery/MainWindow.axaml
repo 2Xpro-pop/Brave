@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:brave="http://github.com/2Xpro-pop/Brave"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+		x:Class="SampleGalery.MainWindow"
+		Title="SampleGalery">
+
+	<Window.Resources>
+
+		<brave:ExecuteExtension x:Key="$Navigate" xml:space="preserve">
+			<brave:ExecuteExtension.Expression>
+				$View = $parameter;
+			</brave:ExecuteExtension.Expression>
+		</brave:ExecuteExtension>
+
+	</Window.Resources>
+
+	<Grid>
+
+		<SplitView IsPaneOpen="{Binding #DrawerToogle.IsChecked}">
+			
+			<SplitView.Pane>
+				<StackPanel Spacing="10">
+					<Border Height="{Binding #DrawerToogle.Bounds.Size.Height}"/>
+
+					<Button Content="Counter" Command="{brave:Execute $Navigate(11)}"/>
+
+				</StackPanel>
+			</SplitView.Pane>
+
+			<ContentPresenter Content="{DynamicResource $View}"/>
+
+		</SplitView>
+
+		<ToggleButton x:Name="DrawerToogle" 
+				HorizontalAlignment="Left"
+				VerticalAlignment="Top">
+			<PathIcon>
+				<PathIcon.Data>
+					M 3,6 L 21,6 L 21,8 L 3,8 Z M 3,11 L 21,11 L 21,13 L 3,13 Z M 3,16 L 21,16 L 21,18 L 3,18 Z
+				</PathIcon.Data>
+			</PathIcon>
+		</ToggleButton>
+
+	</Grid>
+
+</Window>

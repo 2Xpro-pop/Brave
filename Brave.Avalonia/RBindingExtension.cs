@@ -22,7 +22,6 @@ public sealed class RBindingExtension
     public RBindingExtension()
     {
         Expression = null!;
-        IResourceDictionary
     }
 
     public RBindingExtension(string expression)

@@ -18,7 +18,7 @@ internal class InterpretatorExpressionReturnTests
     {
         (var resources, backing) = ResourcesMock.CreateResources(owner: owner, parent: parent);
 
-        return Interpretator.Execute(resources, parameter, expression, useDirectResources);
+        return Interpretator.Execute(resources, parameter, null, expression, useDirectResources);
     }
 
     private static void AssertResult(string expression, object? expected, bool useDirectResources = true)

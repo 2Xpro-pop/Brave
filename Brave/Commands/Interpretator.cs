@@ -12,14 +12,14 @@ internal static class Interpretator
 {
     public static readonly object Void = new();
 
-    public static object Execute(IAbstractResources resources, object? parameter, string expression, bool useDirectResources = false)
+    public static object Execute(IAbstractResources resources, object? parameter, IMetaInfoProvider? metaInfoProvider, string expression, bool useDirectResources = false)
     {
         var instructions = Compiler.Compile(expression, useDirectResources);
 
-        return Execute(resources, parameter, instructions);
+        return Execute(resources, parameter, metaInfoProvider, instructions);
     }
 
-    public static object Execute(IAbstractResources resources, object? parameter, ImmutableArray<CommandInstruction> commandInstructions)
+    public static object Execute(IAbstractResources resources, object? parameter, IMetaInfoProvider? metaInfoProvider, ImmutableArray<CommandInstruction> commandInstructions)
     {
         object? key = null;
         object? value = null;
@@ -110,7 +110,7 @@ internal static class Interpretator
                     break;
 
                 case CommandOpCode.PushSelf:
-                    runtimeStack.Push(resources.Owner);
+                    runtimeStack.Push(metaInfoProvider?.CurrentOrRootObject ?? resources.Owner);
                     break;
 
                 case CommandOpCode.InvokeResource:

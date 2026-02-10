@@ -34,7 +34,7 @@ public class CompilerTests
         using var lexer = new Lexer(source);
         var instructions = Compiler.Compile([.. lexer.LexToEnd()]);
 
-        Interpretator.Execute(resources, parameter ?? new object(), instructions);
+        Interpretator.Execute(resources, parameter ?? new object(), null, instructions);
 
         return (resources, backing);
     }

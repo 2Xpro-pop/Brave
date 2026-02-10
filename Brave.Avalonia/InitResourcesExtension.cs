@@ -32,15 +32,7 @@ public sealed class InitResourcesExtension
 
     public IResourceDictionary ProvideValue(IServiceProvider serviceProvider)
     {
-        if (serviceProvider.GetService(typeof(IProvideValueTarget)) is not IProvideValueTarget provideValueTarget)
-        {
-            throw new InvalidOperationException("IProvideValueTarget service is not available.");
-        }
-
-        if (provideValueTarget.TargetObject is not StyledElement styled)
-        {
-            throw new InvalidOperationException("Target object is not a StyledElement.");
-        }
+        var styled = TargetObjectFinder.Find(serviceProvider);
 
         if (Expression is null)
         {
@@ -48,10 +40,11 @@ public sealed class InitResourcesExtension
         }
 
         var resources = new AvaloniaResources(styled);
+        var metaInfoProvider = new MetaInfoProvider(serviceProvider);
 
         var instructions = Compiler.Compile(Expression, useDirectSetResource: true);
 
-        Interpretator.Execute(resources, parameter: null, instructions);
+        Interpretator.Execute(resources, parameter: null, metaInfoProvider, instructions);
 
         return styled.Resources;
     }

@@ -61,6 +61,8 @@ public sealed class RBindingExtension
 
         var resources = AvaloniaResources.GetFirstResources(parentStackProvider, owner);
 
+        var metaInfoProvider = serviceProvider.GetService(typeof(IMetaInfoProvider)) as IMetaInfoProvider;
+
         if (binding == BindingMode.TwoWay)
         {
             return CreateTwoWayBinding(target, owner, instructions, resources);
@@ -68,17 +70,17 @@ public sealed class RBindingExtension
 
         if (binding is BindingMode.OneWay or BindingMode.Default)
         {
-            return CreateOneWayBinding((IPropertyInfo)target, instructions, resources);
+            return CreateOneWayBinding((IPropertyInfo)target, instructions, resources, metaInfoProvider);
         }
 
         if (binding == BindingMode.OneTime)
         {
-            return CreateOneTimeBinding(instructions, resources);
+            return CreateOneTimeBinding(instructions, resources, metaInfoProvider);
         }
 
         if (binding == BindingMode.OneWayToSource)
         {
-            return CreateOneWayToSource(target, owner, instructions, resources);
+            return CreateOneWayToSource(target, owner, instructions, resources, metaInfoProvider);
         }
 
         return AvaloniaProperty.UnsetValue;
@@ -106,9 +108,9 @@ public sealed class RBindingExtension
         }.ToBinding();
     }
 
-    private static IBinding? CreateOneWayBinding(IPropertyInfo propertyInfo, ImmutableArray<CommandInstruction> instructions, IAbstractResources resources)
+    private static IBinding? CreateOneWayBinding(IPropertyInfo propertyInfo, ImmutableArray<CommandInstruction> instructions, IAbstractResources resources, IMetaInfoProvider? metaInfoProvider)
     {
-        var observableExpression = new ObservableExpression(resources, instructions)
+        var observableExpression = new ObservableExpression(resources, instructions, metaInfoProvider)
         {
             TargetConverter = (obj) => DefaultValueConverter.Instance.Convert(obj, propertyInfo.PropertyType, null, CultureInfo.CurrentUICulture)
         };
@@ -116,16 +118,16 @@ public sealed class RBindingExtension
         return observableExpression.ToBinding();
     }
 
-    private static object? CreateOneTimeBinding(ImmutableArray<CommandInstruction> instructions, IAbstractResources resources)
+    private static object? CreateOneTimeBinding(ImmutableArray<CommandInstruction> instructions, IAbstractResources resources, IMetaInfoProvider? metaInfoProvider)
     {
-        return Interpretator.Execute(resources, null, instructions);
+        return Interpretator.Execute(resources, null, metaInfoProvider, instructions);
     }
 
-    private static object CreateOneWayToSource(object targetProperty, object owner, ImmutableArray<CommandInstruction> instructions, IAbstractResources resources)
+    private static object CreateOneWayToSource(object targetProperty, object owner, ImmutableArray<CommandInstruction> instructions, IAbstractResources resources, IMetaInfoProvider? metaInfoProvider)
     {
         var source = GetSource(targetProperty, owner);
 
-        source.Subscribe(new OneWayToSourceObserver(instructions, resources));
+        source.Subscribe(new OneWayToSourceObserver(instructions, resources, metaInfoProvider));
 
         return AvaloniaProperty.UnsetValue;
     }
@@ -162,11 +164,13 @@ public sealed class RBindingExtension
     {
         private readonly ImmutableArray<CommandInstruction> _instructions;
         private readonly IAbstractResources _resources;
+        private readonly IMetaInfoProvider? _metaInfoProvider;
 
-        public OneWayToSourceObserver(ImmutableArray<CommandInstruction> instructions, IAbstractResources resources)
+        public OneWayToSourceObserver(ImmutableArray<CommandInstruction> instructions, IAbstractResources resources, IMetaInfoProvider? metaInfoProvider)
         {
             _instructions = instructions;
             _resources = resources;
+            _metaInfoProvider = metaInfoProvider;
         }
 
         public void OnCompleted()
@@ -179,7 +183,7 @@ public sealed class RBindingExtension
 
         public void OnNext(object? parameter)
         {
-            Interpretator.Execute(_resources, parameter, _instructions);
+            Interpretator.Execute(_resources, parameter, _metaInfoProvider, _instructions);
         }
     }
 }

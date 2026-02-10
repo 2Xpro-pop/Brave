@@ -25,7 +25,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["Y", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -50,7 +50,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["Result", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         Assert.That(backingDictionary["Result"], Is.EqualTo("F"));
     }
@@ -71,7 +71,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["Result", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         Assert.That(backingDictionary["Result"], Is.EqualTo("T"));
     }
@@ -93,7 +93,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["R", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         Assert.That(backingDictionary["R"], Is.EqualTo("value"));
     }
@@ -115,7 +115,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["R", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         Assert.That(backingDictionary["R"], Is.EqualTo("fallback"));
     }
@@ -142,7 +142,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["Result", RuntimeStack.Indexes.Last]) // 8
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         Assert.That(backingDictionary.ContainsKey("Hit"), Is.False);
         Assert.That(backingDictionary["Result"], Is.EqualTo(false));
@@ -170,7 +170,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["Result", RuntimeStack.Indexes.Last]) // 8
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -195,7 +195,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["S", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -218,7 +218,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.SetResource, ["A", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -243,7 +243,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["Result", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -265,7 +265,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["R", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -287,7 +287,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["R", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -309,7 +309,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["R", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -331,7 +331,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["R", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -360,7 +360,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["BitNot", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -398,7 +398,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["Div", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -427,7 +427,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["Or", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -459,7 +459,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["Xor", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {
@@ -507,7 +507,7 @@ public sealed class InterpretatorTests
             new CommandInstruction(CommandOpCode.DirectSetResource, ["Le", RuntimeStack.Indexes.Last])
         );
 
-        Interpretator.Execute(resources, parameter, commandInstructions);
+        Interpretator.Execute(resources, parameter, null, commandInstructions);
 
         using (Assert.EnterMultipleScope())
         {

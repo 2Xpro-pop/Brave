@@ -36,7 +36,7 @@ public sealed class ExecuteExtension
 
     public ICommand? ProvideValue(IServiceProvider serviceProvider)
     {
-        var styled = GetTargetObject(serviceProvider);
+        var styled = TargetObjectFinder.Find(serviceProvider);
 
         if (Expression is null)
         {
@@ -52,30 +52,4 @@ public sealed class ExecuteExtension
         return new CommandExecutor(resources, instructions, metaInfoProvider);
     }
 
-    private static StyledElement GetTargetObject(IServiceProvider serviceProvider)
-    {
-
-        if (serviceProvider.GetService(typeof(IProvideValueTarget)) is IProvideValueTarget provideValueTarget)
-        {
-            if (provideValueTarget.TargetObject is StyledElement styled)
-            {
-                return styled;
-            }
-        }
-
-        if(serviceProvider.GetService(typeof(IRootObjectProvider)) is IRootObjectProvider rootObjectProvider)
-        {
-            if (rootObjectProvider.RootObject is StyledElement styled)
-            {
-                return styled;
-            }
-
-            if(rootObjectProvider.IntermediateRootObject is StyledElement styledIntermediate)
-            {
-                return styledIntermediate;
-            }
-        }
-
-        throw new InvalidOperationException("Target or Root object is not a StyledElement.");
-    }
 }

@@ -46,8 +46,9 @@ public sealed class ObservableExpressionTests
         using (Assert.EnterMultipleScope())
         {
             Assert.That(observer.Error, Is.Null);
-            Assert.That(observer.Values, Has.Count.EqualTo(1));
-            Assert.That(observer.Values[0], Is.EqualTo(12));
+            Assert.That(observer.Values, Has.Count.EqualTo(2));
+            Assert.That(observer.Values[0], Is.EqualTo(3));
+            Assert.That(observer.Values[1], Is.EqualTo(12));
         }
     }
 
@@ -65,11 +66,11 @@ public sealed class ObservableExpressionTests
 
         resources["$b"] = 123;
 
-        Assert.That(observer.Values, Is.Empty);
+        Assert.That(observer.Values, Is.EqualTo(new object?[] { 1 }));
 
         resources["$a"] = 2;
 
-        Assert.That(observer.Values, Is.EqualTo(new object?[] { 2 }));
+        Assert.That(observer.Values, Is.EqualTo(new object?[] { 1, 2 }));
     }
 
     [Test]
@@ -115,14 +116,14 @@ public sealed class ObservableExpressionTests
         var sub = observable.Subscribe(observer);
 
         resources["$a"] = 2;
-        Assert.That(observer.Values, Is.EqualTo(new object?[] { 2 }));
+        Assert.That(observer.Values, Is.EqualTo(new object?[] { 1, 2 }));
 
         sub.Dispose();
 
         resources["$a"] = 3;
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(observer.Values, Is.EqualTo(new object?[] { 2 }));
+            Assert.That(observer.Values, Is.EqualTo(new object?[] { 1, 2 }));
             Assert.That(observer.CompletedCount, Is.EqualTo(0));
         }
     }
@@ -140,7 +141,7 @@ public sealed class ObservableExpressionTests
         using var sub = observable.Subscribe(observer);
 
         resources["$a"] = 2;
-        Assert.That(observer.Values, Is.EqualTo(new object?[] { 2 }));
+        Assert.That(observer.Values, Is.EqualTo(new object?[] { 1, 2 }));
 
         observable.Dispose();
 
@@ -151,7 +152,7 @@ public sealed class ObservableExpressionTests
         }
 
         resources["$a"] = 3;
-        Assert.That(observer.Values, Is.EqualTo(new object?[] { 2 }));
+        Assert.That(observer.Values, Is.EqualTo(new object?[] { 1, 2 }));
     }
 
     [Test]
@@ -170,7 +171,7 @@ public sealed class ObservableExpressionTests
         var s2 = observable.Subscribe(o2);
 
         s1.Dispose();
-        observable.Dispose(); 
+        observable.Dispose();
 
         using (Assert.EnterMultipleScope())
         {

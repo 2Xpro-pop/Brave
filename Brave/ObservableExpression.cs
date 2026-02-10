@@ -10,7 +10,7 @@ using System.Text;
 namespace Brave;
 
 
-public sealed class ObservableExpression : IObservable<object?>, IDisposable
+internal sealed class ObservableExpression : IObservable<object?>, IDisposable
 {
     const int CacheSize = 16;
     const int CacheMask = CacheSize - 1;
@@ -29,20 +29,22 @@ public sealed class ObservableExpression : IObservable<object?>, IDisposable
     private readonly List<IObserver<object?>> _observers = [];
     private readonly ImmutableArray<IDisposable> _disposables;
     private readonly ImmutableArray<CommandInstruction> _instructions;
+    private readonly IMetaInfoProvider? _metaInfoProvider;
     private readonly WatchingKeys _wathcingKeys;
 
-    public ObservableExpression(IAbstractResources resources, string expression): this(resources, Compiler.Compile(expression))
+    public ObservableExpression(IAbstractResources resources, string expression, IMetaInfoProvider? metaInfoProvider = null) : this(resources, Compiler.Compile(expression), metaInfoProvider)
     {
     }
 
-    public ObservableExpression(IAbstractResources resources, ImmutableArray<CommandInstruction> instructions): this(resources, instructions, GetWatchingKeys(instructions))
+    public ObservableExpression(IAbstractResources resources, ImmutableArray<CommandInstruction> instructions, IMetaInfoProvider? metaInfoProvider = null) : this(resources, instructions, metaInfoProvider, GetWatchingKeys(instructions))
     {
     }
 
-    public ObservableExpression(IAbstractResources resources, ImmutableArray<CommandInstruction> instructions, WatchingKeys wathcingKeys)
+    public ObservableExpression(IAbstractResources resources, ImmutableArray<CommandInstruction> instructions, IMetaInfoProvider? metaInfoProvider, WatchingKeys wathcingKeys)
     {
         _resources = resources;
         _instructions = instructions;
+        _metaInfoProvider = metaInfoProvider;
         _wathcingKeys = wathcingKeys;
 
         using var disposables = ImmutableArrayBuilder<IDisposable>.Rent();
@@ -97,7 +99,7 @@ public sealed class ObservableExpression : IObservable<object?>, IDisposable
 
     private void Calculate()
     {
-        Value = Interpretator.Execute(_resources, Parameter, _instructions);
+        Value = Interpretator.Execute(_resources, Parameter, _metaInfoProvider, _instructions);
     }
 
     private void Notify(object? value)

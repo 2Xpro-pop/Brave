@@ -33,6 +33,6 @@ internal sealed class CommandExecutor : ICommand
 
     public void Execute(object? parameter)
     {
-        Interpretator.Execute(_resources, parameter, _commandInstructions);
+        Interpretator.Execute(_resources, parameter, _metaInfoProvider, _commandInstructions);
     }
 }

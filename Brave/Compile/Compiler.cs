@@ -61,6 +61,12 @@ public static class Compiler
 
     private static void ParseAssignment(ref TokenReader reader, ImmutableArrayBuilder<CommandInstruction> builder, bool useDirectSetResource)
     {
+        if (TryPeekIndexAssignment(ref reader, out var indexAssignmentOperatorKind))
+        {
+            ParseIndexAssignment(ref reader, builder, useDirectSetResource, indexAssignmentOperatorKind);
+            return;
+        }
+
         if (TryPeekResourceAssignment(ref reader, out var resourceKey, out var assignmentOperatorKind))
         {
             // Consume "$" + name
@@ -531,6 +537,16 @@ public static class Compiler
 
             var key = "$" + name.Text;
 
+            // $Resource[<index expression>]
+            if (reader.TryConsume(SyntaxKind.OpenBracketToken))
+            {
+                ParseExpression(ref reader, builder, useDirectSetResource);
+                reader.Consume(SyntaxKind.CloseBracketToken);
+
+                builder.Add(new CommandInstruction(CommandOpCode.IndexGet, [key]));
+                return;
+            }
+
             // Post ++ / -- on resource
             if (reader.TryConsume(SyntaxKind.PlusPlusToken))
             {
@@ -645,6 +661,69 @@ public static class Compiler
         return true;
     }
 
+    private static bool TryPeekIndexAssignment(ref TokenReader reader, out SyntaxKind assignmentOperatorKind)
+    {
+        assignmentOperatorKind = SyntaxKind.None;
+
+        // Must start with: $ <identifier> [
+        if (!reader.IsCurrent(SyntaxKind.DollarToken))
+        {
+            return false;
+        }
+
+        if (!reader.TryPeek(1, out var nameToken) || nameToken.Kind != SyntaxKind.IdentifierToken)
+        {
+            return false;
+        }
+
+        if (!reader.TryPeek(2, out var openBracketToken) || openBracketToken.Kind != SyntaxKind.OpenBracketToken)
+        {
+            return false;
+        }
+
+        // Find matching ']'
+        var bracketDepth = 0;
+        var scanOffset = 2; // points to first '['
+
+        while (true)
+        {
+            if (!reader.TryPeek(scanOffset, out var token))
+            {
+                return false;
+            }
+
+            if (token.Kind == SyntaxKind.OpenBracketToken)
+            {
+                bracketDepth++;
+            }
+            else if (token.Kind == SyntaxKind.CloseBracketToken)
+            {
+                bracketDepth--;
+            }
+
+            scanOffset++;
+
+            if (bracketDepth == 0)
+            {
+                break; // scanOffset now points to token AFTER the matching ']'
+            }
+        }
+
+        // The next token after ']' must be an assignment operator
+        if (!reader.TryPeek(scanOffset, out var operatorToken))
+        {
+            return false;
+        }
+
+        if (!IsAssignmentOperator(operatorToken.Kind))
+        {
+            return false;
+        }
+
+        assignmentOperatorKind = operatorToken.Kind;
+        return true;
+    }
+
     private static bool IsAssignmentOperator(SyntaxKind kind)
     {
         return kind is
@@ -679,6 +758,112 @@ public static class Compiler
         builder.Add(new CommandInstruction(CommandOpCode.SetResource, [key, valueSource]));
     }
 
+    private static void ParseIndexAssignment(
+        ref TokenReader reader,
+        ImmutableArrayBuilder<CommandInstruction> builder,
+        bool useDirectSetResource,
+        SyntaxKind assignmentOperatorKind)
+    {
+        // Parse: $X[<indexExpr>] <op>= <rhsExpr>
+
+        reader.Consume(SyntaxKind.DollarToken);
+        var nameToken = reader.Consume(SyntaxKind.IdentifierToken);
+
+        var resourceKey = "$" + nameToken.Text;
+
+        reader.Consume(SyntaxKind.OpenBracketToken);
+
+        // Compile index expression into a temporary list.
+        // IMPORTANT: IndexSet expects stack order [value, index] (index is popped first),
+        // so we will append these instructions AFTER compiling RHS.
+        using var indexInstructionBuilder = ImmutableArrayBuilder<CommandInstruction>.Rent();
+        ParseExpression(ref reader, indexInstructionBuilder, useDirectSetResource);
+
+        reader.Consume(SyntaxKind.CloseBracketToken);
+
+        // Consume the assignment operator token (we already peeked it)
+        reader.Consume(assignmentOperatorKind);
+
+        var indexInstructions = indexInstructionBuilder.ToImmutable();
+
+        // -------- Simple '=' --------
+        if (assignmentOperatorKind == SyntaxKind.EqualsToken)
+        {
+            // RHS first => pushes value
+            ParseAssignment(ref reader, builder, useDirectSetResource);
+
+            // Then index => pushes index (so stack becomes [value, index])
+            AppendWithJumpTargetOffset(builder, indexInstructions, builder.Count);
+
+            builder.Add(new CommandInstruction(CommandOpCode.IndexSet, [resourceKey]));
+            return;
+        }
+
+        // -------- ??= --------
+        if (assignmentOperatorKind == SyntaxKind.QuestionQuestionEqualsToken)
+        {
+            // Evaluate current: IndexGet pushes currentValue
+            AppendWithJumpTargetOffset(builder, indexInstructions, builder.Count);
+            builder.Add(new CommandInstruction(CommandOpCode.IndexGet, [resourceKey]));
+
+            // If null -> assign branch (JumpIfNull pops null)
+            var jumpAssignIndex = EmitJump(builder, CommandOpCode.JumpIfNull);
+
+            // Not null -> skip assign, keep currentValue as result
+            var jumpEndIndex = EmitJump(builder, CommandOpCode.Jump);
+
+            var assignIndex = builder.Count;
+
+            // RHS => value
+            ParseAssignment(ref reader, builder, useDirectSetResource);
+
+            // index => [value, index]
+            AppendWithJumpTargetOffset(builder, indexInstructions, builder.Count);
+
+            // set => pushes value as result
+            builder.Add(new CommandInstruction(CommandOpCode.IndexSet, [resourceKey]));
+
+            var endIndex = builder.Count;
+
+            PatchJump(builder, jumpAssignIndex, assignIndex);
+            PatchJump(builder, jumpEndIndex, endIndex);
+            return;
+        }
+
+        // -------- Compound assignments: += -= *= /= --------
+        if (assignmentOperatorKind is SyntaxKind.PlusEqualsToken
+            or SyntaxKind.MinusEqualsToken
+            or SyntaxKind.AsteriskEqualsToken
+            or SyntaxKind.SlashEqualsToken)
+        {
+            // NOTE:
+            // Without a Dup/Temp opcode we must evaluate index expression twice:
+            // 1) to read current value
+            // 2) to write the new value back
+            //
+            // If you want single-evaluation semantics later, add a Dup opcode (or temp locals).
+
+            var arithmeticOpCode = MapCompoundOperatorToOpCode(assignmentOperatorKind);
+
+            // Read: IndexGet
+            AppendWithJumpTargetOffset(builder, indexInstructions, builder.Count);
+            builder.Add(new CommandInstruction(CommandOpCode.IndexGet, [resourceKey]));
+
+            // RHS
+            ParseAssignment(ref reader, builder, useDirectSetResource);
+
+            // Apply op
+            builder.Add(new CommandInstruction(arithmeticOpCode));
+
+            // Write: IndexSet (needs [value, index])
+            AppendWithJumpTargetOffset(builder, indexInstructions, builder.Count);
+            builder.Add(new CommandInstruction(CommandOpCode.IndexSet, [resourceKey]));
+            return;
+        }
+
+        throw new InvalidOperationException($"Unsupported index assignment operator: {assignmentOperatorKind}");
+    }
+
     private static int EmitJump(ImmutableArrayBuilder<CommandInstruction> builder, CommandOpCode opcode)
     {
         var index = builder.Count;
@@ -689,6 +874,38 @@ public static class Compiler
     private static void PatchJump(ImmutableArrayBuilder<CommandInstruction> builder, int instructionIndex, int target)
     {
         builder[instructionIndex] = new CommandInstruction(builder[instructionIndex].OpCode, [target]);
+    }
+
+    private static void AppendWithJumpTargetOffset(
+        ImmutableArrayBuilder<CommandInstruction> destination,
+        ImmutableArray<CommandInstruction> source,
+        int instructionIndexOffset)
+    {
+        for (var instructionIndex = 0; instructionIndex < source.Length; instructionIndex++)
+        {
+            var instruction = source[instructionIndex];
+
+            if (IsJumpOpCode(instruction.OpCode))
+            {
+                var originalTarget = (int)instruction.Arguments[0];
+                var shiftedTarget = originalTarget + instructionIndexOffset;
+
+                destination.Add(new CommandInstruction(instruction.OpCode, [shiftedTarget]));
+                continue;
+            }
+
+            destination.Add(instruction);
+        }
+    }
+
+    private static bool IsJumpOpCode(CommandOpCode opCode)
+    {
+        return opCode is
+            CommandOpCode.Jump or
+            CommandOpCode.JumpIfFalse or
+            CommandOpCode.JumpIfTrue or
+            CommandOpCode.JumpIfNull or
+            CommandOpCode.JumpIfNotNull;
     }
 
     private struct TokenReader

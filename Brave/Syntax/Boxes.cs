@@ -33,6 +33,8 @@ internal static class Boxes
         };
     }
 
+    public static object Box(uint value) => value;
+
     public static object Box(double value)
     {
         return value switch
@@ -43,6 +45,16 @@ internal static class Boxes
             _ => value,
         };
     }
+
+    public static object Box(string value) => value;
+
+    public static object Box(long value) => value;
+
+    public static object Box(ulong value) => value;
+
+    public static object Box(float value) => value;
+
+    public static object Box(decimal value) => value;
 
     public static object Box(object self) => self;
 }

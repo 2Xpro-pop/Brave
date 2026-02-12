@@ -1,6 +1,7 @@
 ﻿using Brave.Compile;
 using Brave.Syntax;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
@@ -25,6 +26,8 @@ internal static class Interpretator
         object? value = null;
         object? nextValue = null;
         object? target = null;
+        object? index = null;
+        object? collection = null;
 
         using var runtimeStack = new RuntimeStack();
 
@@ -128,6 +131,54 @@ internal static class Interpretator
 
                     cmd.Execute(value);
                     break;
+
+                // -------- Indexing --------
+
+                case CommandOpCode.IndexGet:
+                    key = arguments[0];
+                    index = runtimeStack.Pop();      // index
+                    collection = resources.GetOrCreate(key);
+
+                    if(collection is IDictionary)
+                    {
+                        value = ((IDictionary)collection)[index];
+                    }
+                    else if(collection is IList list && index is int intIndex)
+                    {
+                        value = list[intIndex];
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Resource '{key}' is not indexable.");
+                    }
+
+                    runtimeStack.Push(value);
+
+                    break;
+
+                case CommandOpCode.IndexSet:
+                    key = arguments[0];
+                    index = runtimeStack.Pop();      // index
+                    value = runtimeStack.Pop();      // value
+                    collection = resources.GetOrCreate(key);
+
+                    if (collection is IDictionary)
+                    {
+                        ((IDictionary)collection)[index] = value;
+                    }
+                    else if (collection is IList list && index is int intIndex)
+                    {
+                        list[intIndex] = value;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Resource '{key}' is not indexable.");
+                    }
+
+                    runtimeStack.Push(value);
+
+                    break;
+
                 // -------- Unary --------
 
                 case CommandOpCode.Negate:
@@ -436,23 +487,44 @@ internal static class Interpretator
             return Boxes.Box(l + r);
         }
 
-        if (left is double || right is double || left is float || right is float)
+        if (left is double || right is double)
         {
             var l = left is null ? 0d : Convert.ToDouble(left);
             var r = right is null ? 0d : Convert.ToDouble(right);
             return Boxes.Box(l + r);
         }
 
-        if (left is ulong || right is ulong || left is uint || right is uint)
+        if (left is float || right is float)
+        {
+            var l = left is null ? 0f : Convert.ToSingle(left);
+            var r = right is null ? 0f : Convert.ToSingle(right);
+            return Boxes.Box(l + r);
+        }
+
+        if (left is ulong || right is ulong)
         {
             var l = left is null ? 0ul : Convert.ToUInt64(left);
             var r = right is null ? 0ul : Convert.ToUInt64(right);
             return Boxes.Box(l + r);
         }
 
+        if (left is long || right is long)
         {
             var l = left is null ? 0L : Convert.ToInt64(left);
             var r = right is null ? 0L : Convert.ToInt64(right);
+            return Boxes.Box(l + r);
+        }
+
+        if (left is uint || right is uint)
+        {
+            var l = left is null ? 0u : Convert.ToUInt32(left);
+            var r = right is null ? 0u : Convert.ToUInt32(right);
+            return Boxes.Box(l + r);
+        }
+
+        {
+            var l = left is null ? 0 : Convert.ToInt32(left);
+            var r = right is null ? 0 : Convert.ToInt32(right);
             return Boxes.Box(l + r);
         }
     }
@@ -466,27 +538,47 @@ internal static class Interpretator
             return Boxes.Box(l - r);
         }
 
-        if (left is double || right is double || left is float || right is float)
+        if (left is double || right is double)
         {
             var l = left is null ? 0d : Convert.ToDouble(left);
             var r = right is null ? 0d : Convert.ToDouble(right);
             return Boxes.Box(l - r);
         }
 
-        if (left is ulong || right is ulong || left is uint || right is uint)
+        if (left is float || right is float)
+        {
+            var l = left is null ? 0f : Convert.ToSingle(left);
+            var r = right is null ? 0f : Convert.ToSingle(right);
+            return Boxes.Box(l - r);
+        }
+
+        if (left is ulong || right is ulong)
         {
             var l = left is null ? 0ul : Convert.ToUInt64(left);
             var r = right is null ? 0ul : Convert.ToUInt64(right);
             return Boxes.Box(l - r);
         }
 
+        if (left is long || right is long)
         {
             var l = left is null ? 0L : Convert.ToInt64(left);
             var r = right is null ? 0L : Convert.ToInt64(right);
             return Boxes.Box(l - r);
         }
-    }
 
+        if (left is uint || right is uint)
+        {
+            var l = left is null ? 0u : Convert.ToUInt32(left);
+            var r = right is null ? 0u : Convert.ToUInt32(right);
+            return Boxes.Box(l - r);
+        }
+
+        {
+            var l = left is null ? 0 : Convert.ToInt32(left);
+            var r = right is null ? 0 : Convert.ToInt32(right);
+            return Boxes.Box(l - r);
+        }
+    }
 
     private static object MultiplyNumeric(object? left, object? right)
     {
@@ -497,23 +589,44 @@ internal static class Interpretator
             return Boxes.Box(l * r);
         }
 
-        if (left is double || right is double || left is float || right is float)
+        if (left is double || right is double)
         {
             var l = left is null ? 0d : Convert.ToDouble(left);
             var r = right is null ? 0d : Convert.ToDouble(right);
             return Boxes.Box(l * r);
         }
 
-        if (left is ulong || right is ulong || left is uint || right is uint)
+        if (left is float || right is float)
+        {
+            var l = left is null ? 0f : Convert.ToSingle(left);
+            var r = right is null ? 0f : Convert.ToSingle(right);
+            return Boxes.Box(l * r);
+        }
+
+        if (left is ulong || right is ulong)
         {
             var l = left is null ? 0ul : Convert.ToUInt64(left);
             var r = right is null ? 0ul : Convert.ToUInt64(right);
             return Boxes.Box(l * r);
         }
 
+        if (left is long || right is long)
         {
             var l = left is null ? 0L : Convert.ToInt64(left);
             var r = right is null ? 0L : Convert.ToInt64(right);
+            return Boxes.Box(l * r);
+        }
+
+        if (left is uint || right is uint)
+        {
+            var l = left is null ? 0u : Convert.ToUInt32(left);
+            var r = right is null ? 0u : Convert.ToUInt32(right);
+            return Boxes.Box(l * r);
+        }
+
+        {
+            var l = left is null ? 0 : Convert.ToInt32(left);
+            var r = right is null ? 0 : Convert.ToInt32(right);
             return Boxes.Box(l * r);
         }
     }
@@ -526,53 +639,75 @@ internal static class Interpretator
             var r = right is null ? 0m : Convert.ToDecimal(right);
 
             if (r == 0m)
-            {
                 throw new DivideByZeroException();
-            }
 
             return Boxes.Box(l / r);
         }
 
-        if (left is double || right is double || left is float || right is float)
+        if (left is double || right is double)
         {
             var l = left is null ? 0d : Convert.ToDouble(left);
             var r = right is null ? 0d : Convert.ToDouble(right);
 
             if (r == 0d)
-            {
                 throw new DivideByZeroException();
-            }
 
             return Boxes.Box(l / r);
         }
 
-        // Integer division semantics (C#-like)
-        if (left is ulong || right is ulong || left is uint || right is uint)
+        if (left is float || right is float)
+        {
+            var l = left is null ? 0f : Convert.ToSingle(left);
+            var r = right is null ? 0f : Convert.ToSingle(right);
+
+            if (r == 0f)
+                throw new DivideByZeroException();
+
+            return Boxes.Box(l / r);
+        }
+
+        if (left is ulong || right is ulong)
         {
             var l = left is null ? 0ul : Convert.ToUInt64(left);
             var r = right is null ? 0ul : Convert.ToUInt64(right);
 
             if (r == 0ul)
-            {
                 throw new DivideByZeroException();
-            }
 
             return Boxes.Box(l / r);
         }
 
+        if (left is long || right is long)
         {
             var l = left is null ? 0L : Convert.ToInt64(left);
             var r = right is null ? 0L : Convert.ToInt64(right);
 
             if (r == 0L)
-            {
                 throw new DivideByZeroException();
-            }
+
+            return Boxes.Box(l / r);
+        }
+
+        if (left is uint || right is uint)
+        {
+            var l = left is null ? 0u : Convert.ToUInt32(left);
+            var r = right is null ? 0u : Convert.ToUInt32(right);
+
+            if (r == 0u)
+                throw new DivideByZeroException();
+
+            return Boxes.Box(l / r);
+        }
+        {
+            var l = left is null ? 0 : Convert.ToInt32(left);
+            var r = right is null ? 0 : Convert.ToInt32(right);
+
+            if (r == 0)
+                throw new DivideByZeroException();
 
             return Boxes.Box(l / r);
         }
     }
-
     private static object BitwiseNot(object? value)
     {
         if (value is null)

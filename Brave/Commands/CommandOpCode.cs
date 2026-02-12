@@ -25,6 +25,9 @@ public enum CommandOpCode : byte
 
     InvokeResource,
 
+    IndexGet,
+    IndexSet,
+
     // Unary
     Negate,
     LogicalNot,

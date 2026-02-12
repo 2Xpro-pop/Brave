@@ -15,28 +15,111 @@
 			</brave:ExecuteExtension.Expression>
 		</brave:ExecuteExtension>
 
+		<StaticResourceExtension x:Key="$View" ResourceKey="$SimpleView"/>
+
+		<Border x:Key="$SimpleView">
+			<TextBlock Text="Sample View"/>
+		</Border>
+
+		<Border x:Key="$CounterView" Padding="16">
+			<StackPanel Spacing="8" Resources="{brave:InitResources '$Counter=0'}">
+				<TextBlock FontSize="18" Text="Counter" FontWeight="Bold"/>
+				<TextBlock Text="{brave:RBinding '\'Counter is: \' + $Counter'}"/>
+				<Button Content="Increment"
+						Command="{brave:Execute Expression='$Counter++'}"/>
+			</StackPanel>
+		</Border>
+
+		<StackPanel x:Key="$TwoWayBindingView" Spacing="10" Margin="16"
+					Resources="{brave:InitResources '$Value = 42d'}">
+
+			<TextBlock FontSize="18" Text="Two way binding example"/>
+			<TextBlock Text="{brave:RBinding $Value}"/>
+
+			<Slider Minimum="0" Maximum="100"
+					Value="{brave:RBinding $Value}"/>
+
+			<TextBox Text="{brave:RBinding $Value}"/>
+
+			<TextBlock Text="(Move the slider or edit the number)"/>
+		</StackPanel>
+
+		<StackPanel x:Key="$StepView" Spacing="12" Margin="16">
+
+			<StackPanel.Resources>
+				<x:Int32 x:Key="$Step">0</x:Int32>
+
+				<Border x:Key="$Step1" Padding="16">
+					<TextBlock FontSize="18" Text="Step 1"/>
+				</Border>
+
+				<Border x:Key="$Step2" Padding="16">
+					<TextBlock FontSize="18" Text="Step 2"/>
+				</Border>
+
+				<Border x:Key="$Step3" Padding="16">
+					<TextBlock FontSize="18" Text="Step 3"/>
+				</Border>
+
+				<StaticResourceExtension x:Key="$CurrentStep" ResourceKey="$Step1"/>
+
+			</StackPanel.Resources>
+
+			<TextBlock FontSize="14"
+					   Text="{brave:RBinding '$Step + 1'}"/>
+
+			<ContentPresenter Content="{brave:RBinding $CurrentStep}"/>
+
+			<StackPanel Orientation="Horizontal" Spacing="8">
+				<Button Content="Back"
+						Command="{brave:Execute Expression='
+						$Step = $Step &gt; 0 ? $Step - 1 : 0;
+						$CurrentStep = $Step == 0 ? $Step1 : $Step2;
+						$CurrentStep = $Step == 2 ? $Step3 : $CurrentStep
+						'}" />
+
+				<Button Content="Next"
+						Command="{brave:Execute Expression='
+						$Step = $Step == 2 ? $Step = 2 : $Step++;
+						$CurrentStep = $Step == 2  
+							? $CurrentStep = $Step3 
+							: $Step == 1
+						'}" />
+			</StackPanel>
+		</StackPanel>
+
 	</Window.Resources>
 
-	<Grid>
+	<Panel>
 
 		<SplitView IsPaneOpen="{Binding #DrawerToogle.IsChecked}">
-			
+
 			<SplitView.Pane>
 				<StackPanel Spacing="10">
 					<Border Height="{Binding #DrawerToogle.Bounds.Size.Height}"/>
 
-					<Button Content="Counter" Command="{brave:Execute $Navigate(11)}"/>
+					<Button Content="Counter" Command="{brave:Execute $Navigate($CounterView)}"/>
+
+					<Button Content="TwoWayBinding" Command="{brave:Execute $Navigate($TwoWayBindingView)}"/>
+					<Button Content="Step" Command="{brave:Execute $Navigate($StepView)}"/>
 
 				</StackPanel>
 			</SplitView.Pane>
 
-			<ContentPresenter Content="{DynamicResource $View}"/>
+			<StackPanel Margin="5">
+
+				<Border Height="{Binding #DrawerToogle.Bounds.Size.Height}"/>
+
+				<ContentPresenter Content="{DynamicResource $View}"/>
+			</StackPanel>
 
 		</SplitView>
 
-		<ToggleButton x:Name="DrawerToogle" 
-				HorizontalAlignment="Left"
-				VerticalAlignment="Top">
+		<Border/>
+
+		<ToggleButton x:Name="DrawerToogle"
+					  HorizontalAlignment="Left"
+					  VerticalAlignment="Top">
 			<PathIcon>
 				<PathIcon.Data>
 					M 3,6 L 21,6 L 21,8 L 3,8 Z M 3,11 L 21,11 L 21,13 L 3,13 Z M 3,16 L 21,16 L 21,18 L 3,18 Z
@@ -44,6 +127,6 @@
 			</PathIcon>
 		</ToggleButton>
 
-	</Grid>
+	</Panel>
 
 </Window>

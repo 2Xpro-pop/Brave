@@ -104,15 +104,24 @@ public sealed class AvaloniaResources : IAbstractResources
 
     #region IDictionary Implementation
 
+    private object? _return;
+
     public object? this[object key]
     {
-        get => _resources[key];
+        get =>  key.Equals("$return") ? _return : _resources[key];
         set
         {
+            if(key.Equals("$return"))
+            {
+                _return = value;
+                return;
+            }
+
             if (_resources.TryGetValue(key, out var existingValue) && Equals(existingValue, value))
             {
                 return;
             }
+
             _resources[key] = value;
         }
     }
@@ -152,8 +161,16 @@ public sealed class AvaloniaResources : IAbstractResources
     public bool Remove(KeyValuePair<object, object?> item) =>
         ((IDictionary<object, object?>)_resources).Remove(item);
 
-    public bool TryGetValue(object key, [MaybeNullWhen(false)] out object? value) =>
-        _resources.TryGetValue(key, out value);
+    public bool TryGetValue(object key, [MaybeNullWhen(false)] out object? value)
+    {
+        if(key.Equals("$return"))
+        {
+            value = _return;
+            return true;
+        }
+
+        return _resources.TryGetValue(key, out value);
+    }
 
     IEnumerator IEnumerable.GetEnumerator()
     {

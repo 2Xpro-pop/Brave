@@ -2,6 +2,7 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:objectmodel="using:System.Collections.ObjectModel"
 		xmlns:system="using:System"
 		xmlns:brave="http://github.com/2Xpro-pop/Brave"
 		xmlns:collections="using:System.Collections"
@@ -22,6 +23,25 @@
 		<brave:ExecuteExtension x:Key="$AddOne" xml:space="preserve">
 			<brave:ExecuteExtension.Expression>
 				$return = $parameter + 1;
+			</brave:ExecuteExtension.Expression>
+		</brave:ExecuteExtension>
+
+		<brave:ExecuteExtension x:Key="$Abs" xml:space="preserve">
+			<brave:ExecuteExtension.Expression>
+				$return = $parameter &lt; 0 ? -$parameter : $parameter;
+			</brave:ExecuteExtension.Expression>
+		</brave:ExecuteExtension>
+
+		<brave:ExecuteExtension x:Key="$IsEven" xml:space="preserve">
+			<brave:ExecuteExtension.Expression>
+				$return = ($parameter &amp; 1) == 0;
+			</brave:ExecuteExtension.Expression>
+		</brave:ExecuteExtension>
+
+		<brave:ExecuteExtension x:Key="$ClampValue" xml:space="preserve">
+			<brave:ExecuteExtension.Expression>
+				// читает $Value, $Min, $Max из ресурсов (без параметра)
+				$return = $Value &lt; $Min ? $Min : ($Value &gt; $Max ? $Max : $Value);
 			</brave:ExecuteExtension.Expression>
 		</brave:ExecuteExtension>
 
@@ -191,6 +211,79 @@
 			</StackPanel>
 		</Border>
 
+		<Border x:Key="$IndexingView" Padding="16">
+			<StackPanel Spacing="10">
+
+				<StackPanel.Resources>
+
+					<objectmodel:ObservableCollection x:Key="$Arr" x:TypeArguments="system:Int32">
+						<system:Int32>10</system:Int32>
+						<system:Int32>20</system:Int32>
+						<system:Int32>30</system:Int32>
+					</objectmodel:ObservableCollection>
+
+					<collections:Hashtable x:Key="$Map">
+						<system:String x:Key="name">Alice</system:String>
+						<system:Int32 x:Key="score">100</system:Int32>
+					</collections:Hashtable>
+
+					<system:Object x:Key="$Tmp"/>
+
+				</StackPanel.Resources>
+
+				<TextBlock FontSize="18" FontWeight="Bold" Text="Indexing: list &amp; dictionary"/>
+
+				<TextBlock Text="{brave:RBinding '\'Arr: [\' + $Arr[0] + \', \' + $Arr[1] + \', \' + $Arr[2] + \']\''}"/>
+				<TextBlock Text="{brave:RBinding '\'Map.name=\' + $Map[\'name\'] + \', Map.score=\' + $Map[\'score\']'}"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<Button Content="Arr[0] += 1"
+							Command="{brave:Execute Expression='$Arr[0] += 1'}"/>
+
+					<Button Content="Swap Arr[0] &amp; Arr[2]"
+							Command="{brave:Execute Expression=
+							'$Tmp = $Arr[0]; $Arr[0] = $Arr[2]; $Arr[2] = $Tmp'}"/>
+
+					<Button Content="Map.score += 10"
+							Command="{brave:Execute Expression='$Map[\'score\'] = $Map[\'score\'] + 10'}"/>
+
+					<Button Content="Map.name += !"
+							Command="{brave:Execute Expression='$Map[\'name\'] = $Map[\'name\'] + \'!\''}"/>
+				</StackPanel>
+
+			</StackPanel>
+		</Border>
+
+		<Border x:Key="$FunctionsView" Padding="16">
+			<StackPanel Spacing="10"
+						Resources="{brave:InitResources '$X=-12d; $Min=0; $Max=100'}">
+
+				<TextBlock FontSize="18" FontWeight="Bold" Text="Resource calls as functions"/>
+
+				<TextBlock Text="{brave:RBinding '\'X=\' + $X'}"/>
+				<TextBlock Text="{brave:RBinding '\'Abs(X)=\' + $Abs($X)'}"/>
+				<TextBlock Text="{brave:RBinding '\'AddOne(10)=\' + $AddOne(10)'}"/>
+				<TextBlock Text="{brave:RBinding '\'AddOne(Abs(X))=\' + $AddOne($Abs($X))'}"/>
+				<!--<TextBlock Text="{brave:RBinding '\'IsEven(Abs(X))=\' + $IsEven($Abs($X))'}"/> -->
+
+				<Separator/>
+
+				<TextBlock Text="{brave:RBinding '\'Value=\' + $Value + \', Min=\' + $Min + \', Max=\' + $Max'}"/>
+				<TextBlock Text="{brave:RBinding '\'ClampValue()=\' + $ClampValue()'}"/>
+
+				<Slider Minimum="-50" Maximum="200" Value="{brave:RBinding $X}"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<Button Content="Value += 1" Command="{brave:Execute Expression='$X = $X + 1'}"/>
+					<Button Content="Value -= 1" Command="{brave:Execute Expression='$X = $X - 1'}"/>
+					<Button Content="Value -= 25" Command="{brave:Execute Expression='$X = $X - 25'}"/>
+					<Button Content="Value += 25" Command="{brave:Execute Expression='$X = $X + 25'}"/>
+					<Button Content="Reset" Command="{brave:Execute Expression='$X=-12; $Min=0; $Max=100'}"/>
+				</StackPanel>
+
+			</StackPanel>
+		</Border>
+
 
 	</Window.Resources>
 
@@ -209,6 +302,8 @@
 					<Button Content="Parameter, self and resource" Command="{brave:Execute $Navigate($ParameterSelfView)}"/>
 					<Button Content="Math playground" Command="{brave:Execute $Navigate($MathPlaygroundView)}"/>
 					<Button Content="Null coalescing" Command="{brave:Execute $Navigate($NullCoalesceView)}"/>
+					<Button Content="Indexing" Command="{brave:Execute $Navigate($IndexingView)}"/>
+					<Button Content="Functions" Command="{brave:Execute $Navigate($FunctionsView)}"/>
 				</StackPanel>
 			</SplitView.Pane>
 

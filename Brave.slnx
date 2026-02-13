@@ -2,8 +2,18 @@
   <Folder Name="/Samples/">
     <Project Path="Samples/Adder/Adder.csproj" Id="6f8a3d8e-5e17-4792-ad2a-42d6dd9d2bea" />
     <Project Path="Samples/Counter/Counter.csproj" Id="951aed15-5456-4f9f-bae1-9418f98dd36b" />
-    <Project Path="Samples/SampleGalery.Web/SampleGalery.Web.csproj" Id="e907a7f2-e604-4ac2-b0ba-f4debc1b1c6b" />
-    <Project Path="Samples/SampleGalery/SampleGalery.csproj" Id="dcdb3b5c-3366-4edb-80f2-ee7f54e8ec75" />
+  </Folder>
+  <Folder Name="/Samples/SampleGallery/">
+    <File Path="Samples/SampleGallery/Directory.Packages.props" />
+    <Project Path="Samples/SampleGallery/SampleGallery.Android/SampleGallery.Android.csproj" Id="16990e91-bb3e-4241-94a9-3c95ff656a63">
+      <Deploy />
+    </Project>
+    <Project Path="Samples/SampleGallery/SampleGallery.Browser/SampleGallery.Browser.csproj" Id="e4ab0bf9-ed4c-4d35-a275-507a55c7a64e" />
+    <Project Path="Samples/SampleGallery/SampleGallery.Desktop/SampleGallery.Desktop.csproj" Id="54abd12b-69fa-4ed1-adcc-b349aed1fb05" />
+    <Project Path="Samples/SampleGallery/SampleGallery.iOS/SampleGallery.iOS.csproj" Id="b20e03d1-1f48-44e1-b7d0-9edb5947d04b">
+      <Deploy />
+    </Project>
+    <Project Path="Samples/SampleGallery/SampleGallery/SampleGallery.csproj" Id="b643ba2a-b721-4006-959c-86dc569811a3" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />

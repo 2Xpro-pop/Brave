@@ -1,0 +1,372 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:system="using:System"
+			 xmlns:brave="http://github.com/2Xpro-pop/Brave"
+			 xmlns:collections="using:System.Collections"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 x:Class="SampleGallery.Views.MainView">
+
+	<UserControl.Resources>
+
+		<brave:ExecuteExtension x:Key="$Navigate" xml:space="preserve">
+			<brave:ExecuteExtension.Expression>
+				$View = $parameter;
+			</brave:ExecuteExtension.Expression>
+		</brave:ExecuteExtension>
+
+		<StaticResourceExtension x:Key="$View" ResourceKey="$CounterView"/>
+
+		<brave:ExecuteExtension x:Key="$AddOne" xml:space="preserve">
+			<brave:ExecuteExtension.Expression>
+				$return = $parameter + 1;
+			</brave:ExecuteExtension.Expression>
+		</brave:ExecuteExtension>
+
+		<brave:ExecuteExtension x:Key="$Abs" xml:space="preserve">
+			<brave:ExecuteExtension.Expression>
+				$return = $parameter &lt; 0 ? -$parameter : $parameter;
+			</brave:ExecuteExtension.Expression>
+		</brave:ExecuteExtension>
+
+		<Border x:Key="$CounterView" Padding="16">
+			<StackPanel Spacing="8" Resources="{brave:InitResources '$Counter=0'}">
+				<TextBlock FontSize="18" Text="Counter" FontWeight="Bold"/>
+				<TextBlock Text="{brave:RBinding '\'Counter is: \' + $Counter'}"/>
+				<Button Content="Increment"
+						Command="{brave:Execute Expression='$Counter++'}"/>
+			</StackPanel>
+		</Border>
+
+		<StackPanel x:Key="$TwoWayBindingView" Spacing="10" Margin="16"
+					Resources="{brave:InitResources '$Value = 42d'}">
+
+			<TextBlock FontSize="18" Text="Two way binding example"/>
+			<TextBlock Text="{brave:RBinding $Value}"/>
+
+			<Slider Minimum="0" Maximum="100"
+					Value="{brave:RBinding $Value}"/>
+
+			<TextBox Text="{brave:RBinding $Value}"/>
+
+			<TextBlock Text="(Move the slider or edit the number)"/>
+		</StackPanel>
+
+		<StackPanel x:Key="$StepView" Spacing="12" Margin="16">
+
+			<StackPanel.Resources>
+				<x:Int32 x:Key="$Step">0</x:Int32>
+
+				<collections:ArrayList x:Key="$Views">
+					<Border Padding="16">
+						<TextBlock FontSize="18" Text="Step 1"/>
+					</Border>
+
+					<Border Padding="16" CornerRadius="5" Background="Violet">
+						<TextBlock FontSize="18" Text="Step 2"/>
+					</Border>
+
+					<Border Padding="16">
+						<TextBlock FontSize="18" FontWeight="Bold" Text="Step 3" />
+					</Border>
+
+				</collections:ArrayList>
+
+			</StackPanel.Resources>
+
+			<TextBlock FontSize="14"
+					   Text="{brave:RBinding '$Step + 1'}"/>
+
+			<ContentPresenter Content="{brave:RBinding $Views[$Step]}"/>
+
+			<StackPanel Orientation="Horizontal" Spacing="8">
+				<Button Content="Back"
+						Command="{brave:Execute
+						Expression='
+						$Step = $Step == 0 ? 0 : $Step - 1
+						',
+						CanExecute='$Step &gt; 0'}" />
+
+				<Button Content="Next"
+						Command="{brave:Execute
+						Expression='
+						$Step = $Step == 2 ? 2 : $Step + 1
+						',
+						CanExecute='$Step &lt; 2'}" />
+			</StackPanel>
+		</StackPanel>
+
+		<StackPanel x:Key="$DetailsView"
+					Spacing="8"
+					Resources="{brave:InitResources '$IsOpen=false'}">
+
+			<Button Content="{brave:RBinding '$IsOpen ? \'Hide details\' : \'Show details\''}"
+					Command="{brave:Execute Expression='$IsOpen = !$IsOpen'}"/>
+
+			<Border Padding="10"
+					IsVisible="{brave:RBinding $IsOpen}">
+				<TextBlock Text="Details..." />
+			</Border>
+		</StackPanel>
+
+		<Border x:Key="$ParameterSelfView" Padding="16">
+			<StackPanel Spacing="10"
+						Resources="{brave:InitResources '$Clicks = 0; $LastSender = null'}">
+
+				<TextBlock FontSize="18" FontWeight="Bold" Text="$parameter + $self + resource call"/>
+
+				<TextBlock Text="{brave:RBinding '\'Clicks: \' + $Clicks'}"/>
+				<TextBlock Text="{brave:RBinding '\'AddOne(10) = \' + $AddOne(10)'}"/>
+				<TextBlock Text="{brave:RBinding '$LastSender == null ? \'Last sender: (null)\' : (\'Last sender: \' + $LastSender)'}"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<Button Content="+1 (parameter)"
+							CommandParameter="{brave:RBinding 1, Mode=OneTime}"
+							Command="{brave:Execute Expression='$Clicks += $parameter; $LastSender = \'+1 (parameter) \' + $self'}"/>
+
+					<Button Content="+5 (parameter)"
+							CommandParameter="{brave:RBinding 5, Mode=OneTime}"
+							Command="{brave:Execute Expression='$Clicks += $parameter; $LastSender = \'+5 (parameter) \' + $self'}"/>
+
+					<Button Content="Reset"
+							Command="{brave:Execute Expression='$Clicks = 0; $LastSender = null'}"/>
+				</StackPanel>
+			</StackPanel>
+		</Border>
+
+		<Border x:Key="$MathPlaygroundView" Padding="16">
+			<StackPanel Spacing="10"
+						Resources="{brave:InitResources '$A=7; $B=3; $Mask=5; $IsOn=true'}">
+
+				<TextBlock FontSize="18" FontWeight="Bold" Text="Math playground"/>
+
+				<TextBlock Text="{brave:RBinding '\'A=\' + $A + \', B=\' + $B + \', Mask=\' + $Mask'}"/>
+
+				<TextBlock Text="{brave:RBinding '\'A+B=\' + ($A + $B) + \', A-B=\' + ($A - $B) + \', A*B=\' + ($A * $B)'}"/>
+				<TextBlock Text="{brave:RBinding '\'A/B=\' + ($A / $B) + \', -A=\' + (-$A)'}"/>
+
+				<TextBlock Text="{brave:RBinding '\'~Mask=\' + (~$Mask) + \', Mask&amp;3=\' + ($Mask &amp; 3) + \', Mask|2=\' + ($Mask | 2) + \', Mask^1=\' + ($Mask ^ 1)'}"/>
+
+				<TextBlock Text="{brave:RBinding '\'A&gt;B? \' + ($A &gt; $B) + \', A==B? \' + ($A == $B) + \', A!=B? \' + ($A != $B)'}"/>
+				<TextBlock Text="{brave:RBinding '\'IsOn=\' + $IsOn + \', !IsOn=\' + (!$IsOn)'}"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<Button Content="A++" Command="{brave:Execute Expression='$A++'}"/>
+					<Button Content="--B" Command="{brave:Execute Expression='--$B'}"/>
+					<Button Content="Mask = Mask ^ 1" Command="{brave:Execute Expression='$Mask = $Mask ^ 1'}"/>
+					<Button Content="Toggle IsOn" Command="{brave:Execute Expression='$IsOn = !$IsOn'}"/>
+					<Button Content="Reset" Command="{brave:Execute Expression='$A=7; $B=3; $Mask=5; $IsOn=true'}"/>
+				</StackPanel>
+
+			</StackPanel>
+		</Border>
+
+		<Border x:Key="$NullCoalesceView" Padding="16">
+			<StackPanel Spacing="10"
+						Resources="{brave:InitResources '$Name=null; $Age=null; $Note=null'}">
+
+				<TextBlock FontSize="18" FontWeight="Bold" Text="Null, ??, ??=, ?:, &amp;&amp;, ||"/>
+
+				<StackPanel Spacing="6">
+					<TextBlock Text="Name:"/>
+					<TextBox Text="{brave:RBinding $Name}"/>
+
+					<TextBlock Text="Age:"/>
+					<TextBox Text="{brave:RBinding $Age}"/>
+				</StackPanel>
+
+				<TextBlock Text="{brave:RBinding '\'Name(raw): \' + ($Name ?? \'(null)\')'}"/>
+				<TextBlock Text="{brave:RBinding '\'Age(raw): \' + ($Age ?? \'(null)\')'}"/>
+
+				<TextBlock Text="{brave:RBinding
+				'($Name != null &amp;&amp; $Name != \'\') ? (\'Hello, \' + $Name) : \'Hello, stranger\''}"/>
+
+				<TextBlock Text="{brave:RBinding '\'$Note: \' + ($Note ?? \'(null)\')'}"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<Button Content="Apply defaults (??=)"
+							Command="{brave:Execute Expression=
+							'$Name ??= \'Anonymous\'; $Age ??= 18; $Note ??= (\'User: \' + $Name + \', age: \' + $Age)'}"/>
+
+					<Button Content="Clear"
+							Command="{brave:Execute Expression='$Name=null; $Age=null; $Note=null'}"/>
+				</StackPanel>
+
+			</StackPanel>
+		</Border>
+
+		<Border x:Key="$FunctionsView" Padding="16">
+
+			<Border.Resources>
+				<brave:ExecuteExtension x:Key="$AddOne" xml:space="preserve">
+					<brave:ExecuteExtension.Expression>
+						$return = $parameter + 1;
+					</brave:ExecuteExtension.Expression>
+				</brave:ExecuteExtension>
+
+				<brave:ExecuteExtension x:Key="$Abs" xml:space="preserve">
+					<brave:ExecuteExtension.Expression>
+						$return = $parameter &lt; 0 ? -$parameter : $parameter;
+					</brave:ExecuteExtension.Expression>
+				</brave:ExecuteExtension>
+			</Border.Resources>
+
+			<StackPanel Spacing="10"
+						Resources="{brave:InitResources '$X=-12d'}">
+
+				<TextBlock FontSize="18" FontWeight="Bold" Text="Resource calls as functions"/>
+
+				<TextBlock Text="{brave:RBinding '\'X=\' + $X'}"/>
+				<TextBlock Text="{brave:RBinding '\'Abs(X)=\' + $Abs($X)'}"/>
+				<TextBlock Text="{brave:RBinding '\'AddOne(10)=\' + $AddOne(10)'}"/>
+				<TextBlock Text="{brave:RBinding '\'AddOne(Abs(X))=\' + $AddOne($Abs($X))'}"/>
+				<Separator/>
+
+				<Slider Minimum="-50" Maximum="200" Value="{brave:RBinding $X}"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<Button Content="Value += 1" Command="{brave:Execute Expression='$X = $X + 1'}"/>
+					<Button Content="Value -= 1" Command="{brave:Execute Expression='$X = $X - 1'}"/>
+					<Button Content="Value -= 25" Command="{brave:Execute Expression='$X = $X - 25'}"/>
+					<Button Content="Value += 25" Command="{brave:Execute Expression='$X = $X + 25'}"/>
+					<Button Content="Reset" Command="{brave:Execute Expression='$X=-12; $Min=0; $Max=100'}"/>
+				</StackPanel>
+
+			</StackPanel>
+		</Border>
+
+		<Border x:Key="$CanExecuteView" Padding="16">
+			<StackPanel Spacing="10"
+						Resources="{brave:InitResources '$X=0; $Y=0; $IsAdmin=false; $Action=null'}">
+
+				<TextBlock FontSize="18" FontWeight="Bold" Text="CanExecute logic"/>
+
+				<TextBlock Text="{brave:RBinding '\'X=\' + $X + \', Y=\' + $Y + \', Admin=\' + $IsAdmin'}"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<Button Content="X++" Command="{brave:Execute Expression='$X++'}"/>
+					<Button Content="Y++" Command="{brave:Execute Expression='$Y++'}"/>
+					<Button Content="Toggle Admin" Command="{brave:Execute Expression='$IsAdmin = !$IsAdmin'}"/>
+					<Button Content="Reset" Command="{brave:Execute Expression='$X=0; $Y=0; $IsAdmin=false'}"/>
+				</StackPanel>
+
+				<TextBlock Text="Action is available when (X&gt;0 &amp;&amp; Y&gt;0) || Admin"/>
+
+				<Button Content="Do action"
+						Command="{brave:Execute Expression='$Action = \'Action fired\'',
+						CanExecute='($X &gt; 0 &amp;&amp; $Y &gt; 0) || $IsAdmin'}"/>
+
+				<TextBlock Text="{brave:RBinding '\'$Action: \' + ($Action ?? \'(null)\')'}"/>
+
+			</StackPanel>
+		</Border>
+
+
+	</UserControl.Resources>
+
+	<Panel>
+
+		<SplitView IsPaneOpen="{Binding #DrawerToogle.IsChecked, Mode=TwoWay}">
+
+			<SplitView.Pane>
+				<StackPanel Spacing="10">
+
+					<StackPanel.Styles>
+
+						<Style Selector="RadioButton">
+							<Setter Property="Margin" Value="8,2"/>
+							<Setter Property="Padding" Value="12,10"/>
+							<Setter Property="HorizontalAlignment" Value="Stretch"/>
+							<Setter Property="HorizontalContentAlignment" Value="Left"/>
+							<Setter Property="VerticalContentAlignment" Value="Center"/>
+							<Setter Property="FontSize" Value="14"/>
+							<Setter Property="CornerRadius" Value="10"/>
+							<Setter Property="Background" Value="Transparent"/>
+							<Setter Property="BorderBrush" Value="Transparent"/>
+							<Setter Property="BorderThickness" Value="1"/>
+							<Setter Property="IsHitTestVisible" Value="True"/>
+							<Setter Property="Cursor" Value="Hand"/>
+							<Setter Property="Command" Value="{StaticResource $Navigate}"/>
+
+							<Setter Property="Template">
+								<ControlTemplate>
+									<Border x:Name="Bd"
+											Background="{TemplateBinding Background}"
+											BorderBrush="{TemplateBinding BorderBrush}"
+											BorderThickness="{TemplateBinding BorderThickness}"
+											CornerRadius="{TemplateBinding CornerRadius}">
+										<ContentPresenter Margin="{TemplateBinding Padding}"
+														  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+														  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+														  Content="{TemplateBinding Content}"/>
+									</Border>
+								</ControlTemplate>
+							</Setter>
+						</Style>
+
+						<Style Selector="RadioButton:pointerover /template/ Border#Bd">
+							<Setter Property="Background" Value="#0FFFFFFF"/>
+							<Setter Property="BorderBrush" Value="#22FFFFFF"/>
+						</Style>
+
+						<Style Selector="RadioButton:pressed /template/ Border#Bd">
+							<Setter Property="Background" Value="#16FFFFFF"/>
+							<Setter Property="BorderBrush" Value="#33FFFFFF"/>
+						</Style>
+
+						<Style Selector="RadioButton:checked /template/ Border#Bd">
+							<Setter Property="Background" Value="#1E6BF7FF"/>
+							<Setter Property="BorderBrush" Value="#6B6BF7FF"/>
+						</Style>
+
+						<Style Selector="RadioButton:disabled">
+							<Setter Property="Opacity" Value="0.45"/>
+						</Style>
+
+					</StackPanel.Styles>
+
+					<Border Height="{Binding #DrawerToogle.Bounds.Size.Height}"/>
+
+					<ScrollViewer>
+						<StackPanel>
+							<RadioButton Content="Counter" IsChecked="True" CommandParameter="{StaticResource $CounterView}"/>
+							<RadioButton Content="TwoWayBinding" CommandParameter="{StaticResource $TwoWayBindingView}"/>
+							<RadioButton Content="Indexes &amp; CanExecute" CommandParameter="{StaticResource $StepView}"/>
+							<RadioButton Content="Details" CommandParameter="{StaticResource $DetailsView}"/>
+							<RadioButton Content="Parameter, self and resource" CommandParameter="{StaticResource $ParameterSelfView}"/>
+							<RadioButton Content="Math playground" CommandParameter="{StaticResource $MathPlaygroundView}"/>
+							<RadioButton Content="Null coalescing" CommandParameter="{StaticResource $NullCoalesceView}"/>
+							<RadioButton Content="Functions" CommandParameter="{StaticResource $FunctionsView}"/>
+							<RadioButton Content="CanExecute logic" CommandParameter="{StaticResource $CanExecuteView}"/>
+						</StackPanel>
+					</ScrollViewer>
+
+
+				</StackPanel>
+			</SplitView.Pane>
+
+			<StackPanel Margin="5">
+
+				<Border Height="{Binding #DrawerToogle.Bounds.Size.Height}"/>
+
+				<ContentPresenter Content="{DynamicResource $View}"/>
+			</StackPanel>
+
+		</SplitView>
+
+		<Border/>
+
+		<ToggleButton x:Name="DrawerToogle"
+					  HorizontalAlignment="Left"
+					  VerticalAlignment="Top">
+			<PathIcon>
+				<PathIcon.Data>
+					M 3,6 L 21,6 L 21,8 L 3,8 Z M 3,11 L 21,11 L 21,13 L 3,13 Z M 3,16 L 21,16 L 21,18 L 3,18 Z
+				</PathIcon.Data>
+			</PathIcon>
+		</ToggleButton>
+
+	</Panel>
+
+</UserControl>

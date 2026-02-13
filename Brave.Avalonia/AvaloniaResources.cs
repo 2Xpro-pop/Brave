@@ -109,7 +109,7 @@ public sealed class AvaloniaResources : IAbstractResources
         get => _resources[key];
         set
         {
-            if (_resources[key] == value)
+            if (_resources.TryGetValue(key, out var existingValue) && Equals(existingValue, value))
             {
                 return;
             }

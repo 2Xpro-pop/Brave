@@ -18,6 +18,11 @@ public partial class App : Application
             desktop.MainWindow = new MainWindow();
         }
 
+        if(ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+        {
+            singleView.MainView = new MainView();
+        }
+
         base.OnFrameworkInitializationCompleted();
     }
 }

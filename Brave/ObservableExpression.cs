@@ -99,11 +99,27 @@ internal sealed class ObservableExpression : IObservable<object?>, IDisposable
 
     private void Calculate()
     {
-        Value = Interpretator.Execute(_resources, Parameter, _metaInfoProvider, _instructions);
+        try
+        {
+            Value = Interpretator.Execute(_resources, Parameter, _metaInfoProvider, _instructions);
+        }
+        catch(Exception exception)
+        {
+            Notify(exception);
+        }
     }
 
     private void Notify(object? value)
     {
+        if(value is Exception exception)
+        {
+            var error = BraveConstants.BindingNotificationFactory?.Invoke(exception) ?? exception;
+            foreach (var observer in _observers)
+            {
+                observer.OnNext(error);
+            }
+        }
+
         var converted = TargetConverter is not null ? TargetConverter(value) : value;
 
         foreach (var observer in _observers)

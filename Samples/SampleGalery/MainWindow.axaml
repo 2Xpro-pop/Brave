@@ -17,11 +17,7 @@
 			</brave:ExecuteExtension.Expression>
 		</brave:ExecuteExtension>
 
-		<StaticResourceExtension x:Key="$View" ResourceKey="$SimpleView"/>
-
-		<Border x:Key="$SimpleView">
-			<TextBlock Text="Sample View"/>
-		</Border>
+		<StaticResourceExtension x:Key="$View" ResourceKey="$CounterView"/>
 
 		<brave:ExecuteExtension x:Key="$AddOne" xml:space="preserve">
 			<brave:ExecuteExtension.Expression>
@@ -122,15 +118,42 @@
 				<StackPanel Orientation="Horizontal" Spacing="8">
 					<Button Content="+1 (parameter)"
 							CommandParameter="{brave:RBinding 1, Mode=OneTime}"
-							Command="{brave:Execute Expression='$Clicks += $parameter; $LastSender = $self'}"/>
+							Command="{brave:Execute Expression='$Clicks += $parameter; $LastSender = \'+1 (parameter) \' + $self'}"/>
 
 					<Button Content="+5 (parameter)"
 							CommandParameter="{brave:RBinding 5, Mode=OneTime}"
-							Command="{brave:Execute Expression='$Clicks += $parameter; $LastSender = $self'}"/>
+							Command="{brave:Execute Expression='$Clicks += $parameter; $LastSender = \'+5 (parameter) \' + $self'}"/>
 
 					<Button Content="Reset"
 							Command="{brave:Execute Expression='$Clicks = 0; $LastSender = null'}"/>
 				</StackPanel>
+			</StackPanel>
+		</Border>
+
+		<Border x:Key="$MathPlaygroundView" Padding="16">
+			<StackPanel Spacing="10"
+						Resources="{brave:InitResources '$A=7; $B=3; $Mask=5; $IsOn=true'}">
+
+				<TextBlock FontSize="18" FontWeight="Bold" Text="Math playground"/>
+
+				<TextBlock Text="{brave:RBinding '\'A=\' + $A + \', B=\' + $B + \', Mask=\' + $Mask'}"/>
+
+				<TextBlock Text="{brave:RBinding '\'A+B=\' + ($A + $B) + \', A-B=\' + ($A - $B) + \', A*B=\' + ($A * $B)'}"/>
+				<TextBlock Text="{brave:RBinding '\'A/B=\' + ($A / $B) + \', -A=\' + (-$A)'}"/>
+
+				<TextBlock Text="{brave:RBinding '\'~Mask=\' + (~$Mask) + \', Mask&amp;3=\' + ($Mask &amp; 3) + \', Mask|2=\' + ($Mask | 2) + \', Mask^1=\' + ($Mask ^ 1)'}"/>
+
+				<TextBlock Text="{brave:RBinding '\'A&gt;B? \' + ($A &gt; $B) + \', A==B? \' + ($A == $B) + \', A!=B? \' + ($A != $B)'}"/>
+				<TextBlock Text="{brave:RBinding '\'IsOn=\' + $IsOn + \', !IsOn=\' + (!$IsOn)'}"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<Button Content="A++" Command="{brave:Execute Expression='$A++'}"/>
+					<Button Content="--B" Command="{brave:Execute Expression='--$B'}"/>
+					<Button Content="Mask = Mask ^ 1" Command="{brave:Execute Expression='$Mask = $Mask ^ 1'}"/>
+					<Button Content="Toggle IsOn" Command="{brave:Execute Expression='$IsOn = !$IsOn'}"/>
+					<Button Content="Reset" Command="{brave:Execute Expression='$A=7; $B=3; $Mask=5; $IsOn=true'}"/>
+				</StackPanel>
+
 			</StackPanel>
 		</Border>
 
@@ -146,10 +169,10 @@
 
 					<Button Content="Counter" Command="{brave:Execute $Navigate($CounterView)}"/>
 					<Button Content="TwoWayBinding" Command="{brave:Execute $Navigate($TwoWayBindingView)}"/>
-					<Button Content="Step" Command="{brave:Execute $Navigate($StepView)}"/>
+					<Button Content="Indexes &amp; CanExecute" Command="{brave:Execute $Navigate($StepView)}"/>
 					<Button Content="Details" Command="{brave:Execute $Navigate($DetailsView)}"/>
 					<Button Content="Parameter, self and resource" Command="{brave:Execute $Navigate($ParameterSelfView)}"/>
-
+					<Button Content="Math playground" Command="{brave:Execute $Navigate($MathPlaygroundView)}"/>
 				</StackPanel>
 			</SplitView.Pane>
 

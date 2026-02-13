@@ -51,7 +51,29 @@ public readonly struct Arguments : IReadOnlyList<object>
         null => "Empty",
         IReadOnlyCollection<object?> collection when collection.Count == 0 => "Empty",
         IReadOnlyCollection<object?> collection when collection == NullCollection => "NullCollection",
-        IReadOnlyCollection<object?> collection => $"Count = {collection.Count}",
+        IReadOnlyCollection<object?> collection when collection.Count < 4 => string.Join(", ", collection.Select(x =>
+        {
+            if(x == null)
+            {
+                return "null";
+            }
+            else if (x is string s)
+            {
+                return s.StartsWith('$') ? s : $"\"{s}\"";
+            }
+            else if (x is char c)
+            {
+                return $"'{c}'";
+            }
+            else if(x == RuntimeStack.Indexes.Last)
+            {
+                return "Last";
+            }
+            else
+            {
+                return x.ToString() ?? "null";
+            }
+        })),
         _ => _args.ToString() ?? "null"
     };
 

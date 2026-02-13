@@ -35,7 +35,7 @@ public sealed class RBindingExtension
         get; set;
     }
 
-    public BindingMode BindingMode
+    public BindingMode Mode
     {
         get; set;
     } = BindingMode.Default;
@@ -61,7 +61,7 @@ public sealed class RBindingExtension
 
         var resources = AvaloniaResources.GetFirstResources(parentStackProvider, owner);
 
-        var metaInfoProvider = serviceProvider.GetService(typeof(IMetaInfoProvider)) as IMetaInfoProvider;
+        var metaInfoProvider = new MetaInfoProvider(serviceProvider);
 
         if (binding == BindingMode.TwoWay)
         {
@@ -139,9 +139,9 @@ public sealed class RBindingExtension
             return BindingMode.OneWay;
         }
 
-        if (BindingMode != BindingMode.Default)
+        if (Mode != BindingMode.Default)
         {
-            return BindingMode;
+            return Mode;
         }
 
         return avaloniaProperty.GetMetadata(owner.GetType()).DefaultBindingMode;

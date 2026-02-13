@@ -17,6 +17,7 @@ internal sealed class CommandExecutor : ICommand, IDisposable
     private readonly IObservable<bool>? _canExecuteObservable;
     private readonly IDisposable? _disposable;
     private readonly CanExecuteObserver? _canExecuteObserver;
+    private readonly bool _hasReturn;
 
     internal CommandExecutor(IAbstractResources resources, IObservable<bool>? canExecute, ImmutableArray<CommandInstruction> commandInstructions, IMetaInfoProvider metaInfoProvider)
     {
@@ -27,6 +28,11 @@ internal sealed class CommandExecutor : ICommand, IDisposable
         _canExecuteObservable = canExecute;
         _canExecuteObserver = new CanExecuteObserver(this);
         _disposable = _canExecuteObservable?.Subscribe(_canExecuteObserver);
+        _hasReturn = commandInstructions.Any(i =>
+            (i.OpCode == CommandOpCode.SetResource || i.OpCode == CommandOpCode.DirectSetResource) &&
+            i.Arguments.Count > 0 &&
+            i.Arguments[0]?.ToString() == "$return"
+        );
     }
 
     public event EventHandler? CanExecuteChanged;
@@ -36,6 +42,27 @@ internal sealed class CommandExecutor : ICommand, IDisposable
     public void Execute(object? parameter)
     {
         Interpretator.Execute(_resources, parameter, _metaInfoProvider, _commandInstructions);
+    }
+
+    public object? ExecuteWithReturn(object? parameter, out object? @return)
+    {
+        var result = Interpretator.Execute(_resources, parameter, _metaInfoProvider, _commandInstructions);
+
+        if (_hasReturn)
+        {
+            @return = _resources.TryGetValue("$return", out var value) ? value : null;
+
+            if(@return == RuntimeStack.Indexes.Last)
+            {
+                @return = result;
+            }
+        }
+        else
+        {
+            @return = Interpretator.Void;
+        }
+        
+        return result;
     }
 
     private sealed class CanExecuteObserver : IObserver<bool>

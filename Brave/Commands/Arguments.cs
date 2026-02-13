@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -20,7 +21,7 @@ public static class ArgumentsBuilder
             return new Arguments(Arguments.NullCollection);
         }
 
-        if(args.Length == 1)
+        if (args.Length == 1)
         {
             return new Arguments(args[0]);
         }
@@ -30,6 +31,8 @@ public static class ArgumentsBuilder
 }
 
 [CollectionBuilder(typeof(ArgumentsBuilder), nameof(ArgumentsBuilder.Create))]
+[DebuggerTypeProxy(typeof(ArgumentsDebugView))]
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
 public readonly struct Arguments : IReadOnlyList<object>
 {
     public static readonly IReadOnlyCollection<object?> NullCollection = [null];
@@ -43,6 +46,15 @@ public readonly struct Arguments : IReadOnlyList<object>
         _args = args;
     }
 
+    internal string DebuggerDisplay => _args switch
+    {
+        null => "Empty",
+        IReadOnlyCollection<object?> collection when collection.Count == 0 => "Empty",
+        IReadOnlyCollection<object?> collection when collection == NullCollection => "NullCollection",
+        IReadOnlyCollection<object?> collection => $"Count = {collection.Count}",
+        _ => _args.ToString() ?? "null"
+    };
+
     public int Count
     {
         get
@@ -52,12 +64,12 @@ public readonly struct Arguments : IReadOnlyList<object>
                 return 0;
             }
 
-            if(_args == NullCollection)
+            if (_args == NullCollection)
             {
                 return 0;
             }
 
-            if(_args is System.Collections.ICollection collection)
+            if (_args is System.Collections.ICollection collection)
             {
                 return collection.Count;
             }
@@ -75,7 +87,7 @@ public readonly struct Arguments : IReadOnlyList<object>
                 throw new IndexOutOfRangeException();
             }
 
-            if(_args == NullCollection && index == 0)
+            if (_args == NullCollection && index == 0)
             {
                 return null!;
             }
@@ -85,7 +97,7 @@ public readonly struct Arguments : IReadOnlyList<object>
                 return list[index]!;
             }
 
-            if(index == 0)
+            if (index == 0)
             {
                 return _args;
             }
@@ -128,6 +140,53 @@ public readonly struct Arguments : IReadOnlyList<object>
         public void Reset()
         {
             _index = -1;
+        }
+    }
+
+    internal sealed class ArgumentsDebugView
+    {
+        private readonly Arguments _arguments;
+
+        public ArgumentsDebugView(Arguments arguments)
+        {
+            _arguments = arguments;
+        }
+
+        // Shows items as an array in the debugger
+        public object[] Items
+        {
+            get
+            {
+                if (_arguments.Count == 0)
+                {
+                    // Special-case the NullCollection to still show the single null item
+                    if (GetIsNullCollection(_arguments))
+                        return new object?[] { null! }!;
+                    return Array.Empty<object>();
+                }
+
+                var result = new object[_arguments.Count];
+                for (int i = 0; i < result.Length; i++)
+                {
+                    result[i] = _arguments[i]!;
+                }
+                return result;
+            }
+        }
+
+        private static bool GetIsNullCollection(Arguments arguments)
+        {
+            // Reflection-free check leveraging indexer behavior
+            try
+            {
+                // If Count==0 but index 0 returns null, it’s the special NullCollection.
+                var _ = arguments[0];
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

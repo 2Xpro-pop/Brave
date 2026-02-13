@@ -4,7 +4,7 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:system="using:System"
 		xmlns:brave="http://github.com/2Xpro-pop/Brave"
-        xmlns:collections="using:System.Collections"
+		xmlns:collections="using:System.Collections"
 		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 		x:Class="SampleGalery.MainWindow"
 		Title="SampleGalery">
@@ -22,6 +22,12 @@
 		<Border x:Key="$SimpleView">
 			<TextBlock Text="Sample View"/>
 		</Border>
+
+		<brave:ExecuteExtension x:Key="$AddOne" xml:space="preserve">
+			<brave:ExecuteExtension.Expression>
+				$return = $parameter + 1;
+			</brave:ExecuteExtension.Expression>
+		</brave:ExecuteExtension>
 
 		<Border x:Key="$CounterView" Padding="16">
 			<StackPanel Spacing="8" Resources="{brave:InitResources '$Counter=0'}">
@@ -76,34 +82,73 @@
 			<StackPanel Orientation="Horizontal" Spacing="8">
 				<Button Content="Back"
 						Command="{brave:Execute
-							Expression='
-								$Step = $Step == 0 ? 0 : $Step - 1
-							',
-							CanExecute='$Step &gt; 0'}" />
+						Expression='
+						$Step = $Step == 0 ? 0 : $Step - 1
+						',
+						CanExecute='$Step &gt; 0'}" />
 
 				<Button Content="Next"
-						Command="{brave:Execute 
-							Expression='
-								$Step = $Step == 2 ? 2 : $Step + 1
-							',
-							CanExecute='$Step &lt; 2'}" />
+						Command="{brave:Execute
+						Expression='
+						$Step = $Step == 2 ? 2 : $Step + 1
+						',
+						CanExecute='$Step &lt; 2'}" />
 			</StackPanel>
 		</StackPanel>
+
+		<StackPanel x:Key="$DetailsView"
+					Spacing="8"
+					Resources="{brave:InitResources '$IsOpen=false'}">
+
+			<Button Content="{brave:RBinding '$IsOpen ? \'Hide details\' : \'Show details\''}"
+					Command="{brave:Execute Expression='$IsOpen = !$IsOpen'}"/>
+
+			<Border Padding="10"
+					IsVisible="{brave:RBinding $IsOpen}">
+				<TextBlock Text="Details..." />
+			</Border>
+		</StackPanel>
+
+		<Border x:Key="$ParameterSelfView" Padding="16">
+			<StackPanel Spacing="10"
+						Resources="{brave:InitResources '$Clicks = 0; $LastSender = null'}">
+
+				<TextBlock FontSize="18" FontWeight="Bold" Text="$parameter + $self + resource call"/>
+
+				<TextBlock Text="{brave:RBinding '\'Clicks: \' + $Clicks'}"/>
+				<TextBlock Text="{brave:RBinding '\'AddOne(10) = \' + $AddOne(10)'}"/>
+				<TextBlock Text="{brave:RBinding '$LastSender == null ? \'Last sender: (null)\' : (\'Last sender: \' + $LastSender)'}"/>
+
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<Button Content="+1 (parameter)"
+							CommandParameter="{brave:RBinding 1, Mode=OneTime}"
+							Command="{brave:Execute Expression='$Clicks += $parameter; $LastSender = $self'}"/>
+
+					<Button Content="+5 (parameter)"
+							CommandParameter="{brave:RBinding 5, Mode=OneTime}"
+							Command="{brave:Execute Expression='$Clicks += $parameter; $LastSender = $self'}"/>
+
+					<Button Content="Reset"
+							Command="{brave:Execute Expression='$Clicks = 0; $LastSender = null'}"/>
+				</StackPanel>
+			</StackPanel>
+		</Border>
 
 	</Window.Resources>
 
 	<Panel>
 
-		<SplitView IsPaneOpen="{Binding #DrawerToogle.IsChecked}">
+		<SplitView IsPaneOpen="{Binding #DrawerToogle.IsChecked, Mode=TwoWay}">
 
 			<SplitView.Pane>
 				<StackPanel Spacing="10">
 					<Border Height="{Binding #DrawerToogle.Bounds.Size.Height}"/>
 
 					<Button Content="Counter" Command="{brave:Execute $Navigate($CounterView)}"/>
-
 					<Button Content="TwoWayBinding" Command="{brave:Execute $Navigate($TwoWayBindingView)}"/>
 					<Button Content="Step" Command="{brave:Execute $Navigate($StepView)}"/>
+					<Button Content="Details" Command="{brave:Execute $Navigate($DetailsView)}"/>
+					<Button Content="Parameter, self and resource" Command="{brave:Execute $Navigate($ParameterSelfView)}"/>
 
 				</StackPanel>
 			</SplitView.Pane>

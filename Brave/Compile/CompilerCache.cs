@@ -1,11 +1,12 @@
 ﻿using Brave.Collections;
+using Brave.Commands;
 using Brave.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 
-namespace Brave.Commands;
+namespace Brave.Compile;
 
 internal static class CompilerCache
 {

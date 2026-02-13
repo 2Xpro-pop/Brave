@@ -32,7 +32,7 @@ internal static class IAbstractResourcesExtensions
             return false;
         }
 
-        public object? GetOrCreate(object key, object? defaultValue = null)
+        public object? GetOrCreate(object key, object? defaultValue = null, IMetaInfoProvider? metaInfoProvider = null)
         {
 
             if (resources.TryGetValue(key, out object? value))
@@ -48,6 +48,22 @@ internal static class IAbstractResourcesExtensions
                     return value;
                 }
                 parent = parent.Parent;
+            }
+            
+            if(metaInfoProvider is not null)
+            {
+                var intermediateRootResources = metaInfoProvider.IntermediateRootResources;
+                if (intermediateRootResources != null && intermediateRootResources.TryGetValue(key, out value))
+                {
+                    return value;
+                }
+
+                var root = metaInfoProvider.RootResources;
+
+                if(root != null && root.TryGetValue(key, out value))
+                {
+                    return value;
+                }
             }
 
             resources[key] = defaultValue;

@@ -67,7 +67,7 @@ internal sealed class ObservableExpression : IObservable<object?>, IDisposable
         get;
         private set
         {
-            if (field == value)
+            if (field?.Equals(value) == true)
             {
                 return;
             }
@@ -186,6 +186,11 @@ internal sealed class ObservableExpression : IObservable<object?>, IDisposable
 
                 if (instruction.OpCode == CommandOpCode.GetResource)
                 {
+                    if (instruction.Arguments[0].Equals("$return"))
+                    {
+                        continue;
+                    }
+
                     builder.Add(instruction.Arguments[0]);
                 }
             }

@@ -120,14 +120,26 @@ internal static class Interpretator
                     key = arguments[0];
                     value = runtimeStack.Pop();
 
-                    var command = resources.GetOrCreate(key);
+                    value = runtimeStack.PopOrReturn(value);
+
+                    var command = resources.GetOrCreate(key, metaInfoProvider: metaInfoProvider);
 
                     if (command is not ICommand cmd)
                     {
                         throw new InvalidOperationException($"Resource '{key}' is not a command.");
                     }
 
-                    value = runtimeStack.PopOrReturn(value);
+                    if (command is CommandExecutor commandExecutor)
+                    {
+                        commandExecutor.ExecuteWithReturn(value, out var @return);
+
+                        if(@return != Void)
+                        {
+                            runtimeStack.Push(@return);
+                        }
+                        
+                        break;
+                    }
 
                     cmd.Execute(value);
                     break;

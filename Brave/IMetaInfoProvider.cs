@@ -11,6 +11,21 @@ internal interface IMetaInfoProvider
         get;
     }
 
+    public object? IntermediateRootObject
+    {
+        get;
+    }
+
+    public IAbstractResources? RootResources
+    {
+        get;
+    }
+
+    public IAbstractResources? IntermediateRootResources
+    {
+        get;
+    }
+
     public object? CurrentObject
     {
         get;

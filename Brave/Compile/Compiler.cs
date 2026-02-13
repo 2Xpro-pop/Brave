@@ -566,7 +566,6 @@ public static class Compiler
                 if (reader.TryConsume(SyntaxKind.CloseParenToken))
                 {
                     EmitInvokeResource(builder, key, null!);
-                    builder.Add(new CommandInstruction(CommandOpCode.GetResource, [ReturnResourceKey]));
                     return;
                 }
 
@@ -575,9 +574,6 @@ public static class Compiler
                 reader.Consume(SyntaxKind.CloseParenToken);
 
                 EmitInvokeResource(builder, key, RuntimeStack.Indexes.Last);
-
-                // Invocation is an expression: it evaluates to $return
-                builder.Add(new CommandInstruction(CommandOpCode.GetResource, [ReturnResourceKey]));
                 return;
             }
 
@@ -750,6 +746,12 @@ public static class Compiler
     private static void EmitSetResource(ImmutableArrayBuilder<CommandInstruction> builder, bool useDirectSetResource, string key, object valueSource)
     {
         if (useDirectSetResource)
+        {
+            builder.Add(new CommandInstruction(CommandOpCode.DirectSetResource, [key, valueSource]));
+            return;
+        }
+
+        if(key.Equals("$return"))
         {
             builder.Add(new CommandInstruction(CommandOpCode.DirectSetResource, [key, valueSource]));
             return;

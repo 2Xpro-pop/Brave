@@ -161,6 +161,10 @@ internal sealed class TwoWayRBinding : IObservable<object?>, IDisposable
                         converted = _binding.Value;
                     }
                 }
+                else
+                {
+                    converted = value;
+                }
             }
             else
             {

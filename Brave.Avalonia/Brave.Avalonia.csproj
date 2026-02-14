@@ -1,17 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>true</IsPackable>
 
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.3.9" />
-  </ItemGroup>
+		<PackageId>Brave</PackageId>
+		<Version>1.0.0</Version>
+		<Authors>2Xpro-pop</Authors>
+		<Description>A tiny library that uses a ResourceDictionary as a state holder and adds a small expression language for simple UI logic in XAML.</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/2Xpro-pop/Brave</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Brave\Brave.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.3.9" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Brave\Brave.csproj" />
+	</ItemGroup>
 
 </Project>

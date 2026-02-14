@@ -1,6 +1,6 @@
 # Brave
 
-> If it’s possible and easy to do in XAML — do it in XAML.
+> If it's possible and easy to do in XAML - do it in XAML.
 
 **Brave** is a tiny library that uses a **ResourceDictionary as a state holder** and adds a small expression language for simple UI logic.
 It is **not** an MVVM framework and **not** a general-purpose state-management solution.
@@ -61,7 +61,7 @@ dotnet add package Brave
 
 ### 2) Editing numbers and showing computed output with `RBinding`
 
-If you store `$A` and `$B` as numbers, you often want a nice “proxy” for editing and computed UI text.
+If you store `$A` and `$B` as numbers, you often want a nice `proxy` for editing and computed UI text.
 Use `brave:RBinding`:
 
 ```xaml
@@ -99,8 +99,8 @@ Brave expressions are intentionally small and focused.
 ### Variables / special values
 
 * Resource variables: `$MyKey`
-* `$parameter` — command parameter
-* `$self` — owner object (control instance)
+* `$parameter` - command parameter
+* `$self` - owner object (control instance)
 
 ### Assignment
 
@@ -117,8 +117,8 @@ Brave expressions are intentionally small and focused.
 
 ### Invocation
 
-* `$Action()` — invoke a resource as a command
-* `$Action($param)` — invoke with a parameter expression
+* `$Action()` - invoke a resource as a command
+* `$Action($param)` - invoke with a parameter expression
 
 ### Arithmetic
 

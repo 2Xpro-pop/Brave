@@ -1,0 +1,43 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Install wasm-tools workload
+        run: dotnet workload install wasm-tools
+
+      - name: Publish SampleGallery.Browser
+        run: dotnet publish Samples/SampleGallery/SampleGallery.Browser/SampleGallery.Browser.csproj -c Release -o output
+
+      - name: Rewrite base href
+        run: sed -i 's|<head>|<head><base href="/Brave/" />|' output/wwwroot/index.html
+
+      - name: Add .nojekyll
+        run: touch output/wwwroot/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          publish_dir: ./output/wwwroot
+          publish_branch: gh-pages
+          force_orphan: true

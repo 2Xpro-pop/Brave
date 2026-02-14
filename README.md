@@ -1,10 +1,25 @@
 # Brave
 
+[![NuGet](https://img.shields.io/nuget/v/Brave.svg)](https://www.nuget.org/packages/Brave)
+[![Sample Gallery](https://img.shields.io/badge/Sample%20Gallery-live%20demo-blue)](https://2xpro-pop.github.io/Brave/)
+
 > If it's possible and easy to do in XAML - do it in XAML.
 
 **Brave** is a tiny library that uses a **ResourceDictionary as a state holder** and adds a small expression language for simple UI logic.
 It is **not** an MVVM framework and **not** a general-purpose state-management solution.
 Brave is meant for **small UI state** and **simple interactions**, written directly in XAML.
+
+## Table of Contents
+
+- [What Brave is](#what-brave-is)
+- [What Brave is not](#what-brave-is-not)
+- [Installation](#installation)
+- [How it works (high level)](#how-it-works-high-level)
+- [Usage](#usage)
+- [Expression language (supported operations)](#expression-language-supported-operations)
+- [Notes](#notes)
+- [Roadmap / TODO](#roadmap--todo)
+- [Support](#support)
 
 ## What Brave is
 
@@ -162,4 +177,14 @@ Brave expressions are intentionally small and focused.
 - [ ] Binding to `ObservableCollection`
 - [ ] Binding to `IObservable`
 - [ ] Improve resource change notification performance
+
+## Support
+
+If you find Brave useful and want to support its development, you can send a donation:
+
+**USDT (TRC-20)**
+
+```
+TTMutDKfCS6NCPY3Q2AU3Tgxb9jnzmJm6q
+```
 

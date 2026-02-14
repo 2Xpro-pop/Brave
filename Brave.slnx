@@ -1,25 +1,26 @@
 <Solution>
   <Folder Name="/Samples/">
-    <Project Path="Samples/Adder/Adder.csproj" Id="6f8a3d8e-5e17-4792-ad2a-42d6dd9d2bea" />
-    <Project Path="Samples/Counter/Counter.csproj" Id="951aed15-5456-4f9f-bae1-9418f98dd36b" />
+    <Project Path="D:/Repos/Brave/Samples/Adder/Adder.csproj" Id="6f8a3d8e-5e17-4792-ad2a-42d6dd9d2bea" />
+    <Project Path="D:/Repos/Brave/Samples/Counter/Counter.csproj" Id="951aed15-5456-4f9f-bae1-9418f98dd36b" />
   </Folder>
   <Folder Name="/Samples/SampleGallery/">
     <File Path="Samples/SampleGallery/Directory.Packages.props" />
-    <Project Path="Samples/SampleGallery/SampleGallery.Android/SampleGallery.Android.csproj" Id="16990e91-bb3e-4241-94a9-3c95ff656a63">
+    <Project Path="D:/Repos/Brave/Samples/SampleGallery/SampleGallery.Android/SampleGallery.Android.csproj" Id="16990e91-bb3e-4241-94a9-3c95ff656a63">
       <Deploy />
     </Project>
-    <Project Path="Samples/SampleGallery/SampleGallery.Browser/SampleGallery.Browser.csproj" Id="e4ab0bf9-ed4c-4d35-a275-507a55c7a64e" />
-    <Project Path="Samples/SampleGallery/SampleGallery.Desktop/SampleGallery.Desktop.csproj" Id="54abd12b-69fa-4ed1-adcc-b349aed1fb05" />
-    <Project Path="Samples/SampleGallery/SampleGallery.iOS/SampleGallery.iOS.csproj" Id="b20e03d1-1f48-44e1-b7d0-9edb5947d04b">
+    <Project Path="D:/Repos/Brave/Samples/SampleGallery/SampleGallery.Browser/SampleGallery.Browser.csproj" Id="e4ab0bf9-ed4c-4d35-a275-507a55c7a64e" />
+    <Project Path="D:/Repos/Brave/Samples/SampleGallery/SampleGallery.Desktop/SampleGallery.Desktop.csproj" Id="54abd12b-69fa-4ed1-adcc-b349aed1fb05" />
+    <Project Path="D:/Repos/Brave/Samples/SampleGallery/SampleGallery.iOS/SampleGallery.iOS.csproj" Id="b20e03d1-1f48-44e1-b7d0-9edb5947d04b">
       <Deploy />
     </Project>
-    <Project Path="Samples/SampleGallery/SampleGallery/SampleGallery.csproj" Id="b643ba2a-b721-4006-959c-86dc569811a3" />
+    <Project Path="D:/Repos/Brave/Samples/SampleGallery/SampleGallery/SampleGallery.csproj" Id="b643ba2a-b721-4006-959c-86dc569811a3" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
+    <File Path=".github/workflows/deploy-gh-pages.yml" />
     <File Path="README.md" />
   </Folder>
-  <Project Path="Brave.Avalonia/Brave.Avalonia.csproj" Id="27519af3-c444-44d9-aa93-cdb8c6c3de99" />
-  <Project Path="Brave.Tests/Brave.Tests.csproj" Id="edecb948-978d-446a-850e-83c485cf03b6" />
-  <Project Path="Brave/Brave.csproj" Id="ed6888eb-627d-436b-94d2-d54cacaa5f50" />
+  <Project Path="D:/Repos/Brave/Brave.Avalonia/Brave.Avalonia.csproj" Id="27519af3-c444-44d9-aa93-cdb8c6c3de99" />
+  <Project Path="D:/Repos/Brave/Brave.Tests/Brave.Tests.csproj" Id="edecb948-978d-446a-850e-83c485cf03b6" />
+  <Project Path="D:/Repos/Brave/Brave/Brave.csproj" Id="ed6888eb-627d-436b-94d2-d54cacaa5f50" />
 </Solution>

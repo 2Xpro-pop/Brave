@@ -83,7 +83,7 @@ Use `brave:RBinding`:
 </Window>
 ```
 
-More examples: **Samples** (see repository folder).
+More examples: **[Sample Gallery](https://2xpro-pop.github.io/Brave/)** (live demo) and **Samples** folder in the repository.
 
 ## Expression language (supported operations)
 
@@ -93,7 +93,8 @@ Brave expressions are intentionally small and focused.
 
 * Numbers (decimal / hex / binary) with suffixes: `1`, `1d`, `1f`, `1m`, `0xFF`, `0b1010`
 * Strings: `'text'`, `"text"`, verbatim: `@"text"`, `@'text'`
-* Booleans: `true`, `false` (if you lex them as identifiers, you can still support them in compiler)
+* Booleans: `true`, `false`
+* `null`
 
 ### Variables / special values
 
@@ -105,6 +106,19 @@ Brave expressions are intentionally small and focused.
 
 * `$A = 10`
 * Multiple statements: `$A = 1; $B = $A + 2`
+* Compound: `$A += 1`, `$A -= 2`, `$A *= 3`, `$A /= 4`
+* Null-coalescing assignment: `$A ??= 'default'`
+
+### Indexing
+
+* Read: `$List[0]`, `$Dict[$Key]`
+* Write: `$List[0] = 42`
+* Compound index assignment: `$List[0] += 1`
+
+### Invocation
+
+* `$Action()` — invoke a resource as a command
+* `$Action($param)` — invoke with a parameter expression
 
 ### Arithmetic
 
@@ -129,7 +143,6 @@ Brave expressions are intentionally small and focused.
 
 * `~`
 * `&  |  ^`
-* Shifts: `<<  >>`
 
 ### Increment / decrement
 
@@ -141,4 +154,12 @@ Brave expressions are intentionally small and focused.
 * Brave is designed for **UI logic**. Keep business logic outside XAML.
 * The runtime stack is intentionally small and pooled to reduce allocations.
 * Expressions are compiled into a high-level instruction list (cached), while resource tables are per-instance.
+
+## Roadmap / TODO
+
+- [ ] Binding to ViewModel properties
+- [ ] Dot-access for nested objects (`$Hello.$World`)
+- [ ] Binding to `ObservableCollection`
+- [ ] Binding to `IObservable`
+- [ ] Improve resource change notification performance
 

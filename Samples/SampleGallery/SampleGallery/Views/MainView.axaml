@@ -1,12 +1,21 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:avaloniaedit="https://github.com/avaloniaui/avaloniaedit"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:samplegallery="using:SampleGallery"
 			 xmlns:system="using:System"
 			 xmlns:brave="http://github.com/2Xpro-pop/Brave"
 			 xmlns:collections="using:System.Collections"
 			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 			 x:Class="SampleGallery.Views.MainView">
+
+	<UserControl.Styles>
+		<Style Selector="avaloniaedit|TextEditor">
+			<Setter Property="FontFamily" Value="Cascadia Code,Consolas,Menlo,Monospace"/>
+			<Setter Property="ShowLineNumbers" Value="True"/>
+		</Style>
+	</UserControl.Styles>
 
 	<UserControl.Resources>
 
@@ -32,10 +41,14 @@
 
 		<Border x:Key="$CounterView" Padding="16">
 			<StackPanel Spacing="8" Resources="{brave:InitResources '$Counter=0'}">
+
 				<TextBlock FontSize="18" Text="Counter" FontWeight="Bold"/>
 				<TextBlock Text="{brave:RBinding '\'Counter is: \' + $Counter'}"/>
 				<Button Content="Increment"
 						Command="{brave:Execute Expression='$Counter++'}"/>
+
+				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $CounterView}" />
+
 			</StackPanel>
 		</Border>
 
@@ -51,6 +64,8 @@
 			<TextBox Text="{brave:RBinding $Value}"/>
 
 			<TextBlock Text="(Move the slider or edit the number)"/>
+
+			<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $TwoWayBindingView}" />
 		</StackPanel>
 
 		<StackPanel x:Key="$StepView" Spacing="12" Margin="16">
@@ -95,11 +110,15 @@
 						',
 						CanExecute='$Step &lt; 2'}" />
 			</StackPanel>
+
+			<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $StepView}" />
 		</StackPanel>
 
 		<StackPanel x:Key="$DetailsView"
 					Spacing="8"
 					Resources="{brave:InitResources '$IsOpen=false'}">
+
+			<TextBlock FontSize="18" Text="Prefer use Expander" FontWeight="Bold"/>
 
 			<Button Content="{brave:RBinding '$IsOpen ? \'Hide details\' : \'Show details\''}"
 					Command="{brave:Execute Expression='$IsOpen = !$IsOpen'}"/>
@@ -108,6 +127,8 @@
 					IsVisible="{brave:RBinding $IsOpen}">
 				<TextBlock Text="Details..." />
 			</Border>
+
+			<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $DetailsView}" />
 		</StackPanel>
 
 		<Border x:Key="$ParameterSelfView" Padding="16">
@@ -132,6 +153,9 @@
 					<Button Content="Reset"
 							Command="{brave:Execute Expression='$Clicks = 0; $LastSender = null'}"/>
 				</StackPanel>
+
+				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $ParameterSelfView}" />
+
 			</StackPanel>
 		</Border>
 
@@ -158,6 +182,8 @@
 					<Button Content="Toggle IsOn" Command="{brave:Execute Expression='$IsOn = !$IsOn'}"/>
 					<Button Content="Reset" Command="{brave:Execute Expression='$A=7; $B=3; $Mask=5; $IsOn=true'}"/>
 				</StackPanel>
+
+				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $MathPlaygroundView}" />
 
 			</StackPanel>
 		</Border>
@@ -192,6 +218,8 @@
 					<Button Content="Clear"
 							Command="{brave:Execute Expression='$Name=null; $Age=null; $Note=null'}"/>
 				</StackPanel>
+
+				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $NullCoalesceView}" />
 
 			</StackPanel>
 		</Border>
@@ -233,6 +261,8 @@
 					<Button Content="Reset" Command="{brave:Execute Expression='$X=-12; $Min=0; $Max=100'}"/>
 				</StackPanel>
 
+				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $FunctionsView}" />
+
 			</StackPanel>
 		</Border>
 
@@ -258,6 +288,8 @@
 						CanExecute='($X &gt; 0 &amp;&amp; $Y &gt; 0) || $IsAdmin'}"/>
 
 				<TextBlock Text="{brave:RBinding '\'$Action: \' + ($Action ?? \'(null)\')'}"/>
+
+				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $CanExecuteView}" />
 
 			</StackPanel>
 		</Border>
@@ -346,12 +378,15 @@
 				</StackPanel>
 			</SplitView.Pane>
 
-			<StackPanel Margin="5">
+			<Grid RowDefinitions="Auto, *" Margin="5">
 
 				<Border Height="{Binding #DrawerToogle.Bounds.Size.Height}"/>
 
-				<ContentPresenter Content="{DynamicResource $View}"/>
-			</StackPanel>
+				<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Hidden">
+					<ContentPresenter Content="{DynamicResource $View}"/>
+				</ScrollViewer>
+				
+			</Grid>
 
 		</SplitView>
 

@@ -2,6 +2,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/Brave.svg)](https://www.nuget.org/packages/Brave)
 [![Sample Gallery](https://img.shields.io/badge/Sample%20Gallery-live%20demo-blue)](https://2xpro-pop.github.io/Brave/)
+[![Donate USDT](https://img.shields.io/badge/Donate-USDT%20(TRC--20)-green)](https://tronscan.org/#/address/TTMutDKfCS6NCPY3Q2AU3Tgxb9jnzmJm6q)
 
 > If it's possible and easy to do in XAML - do it in XAML.
 
@@ -177,6 +178,11 @@ Brave expressions are intentionally small and focused.
 - [ ] Binding to `ObservableCollection`
 - [ ] Binding to `IObservable`
 - [ ] Improve resource change notification performance
+- [ ] Better error handling and diagnostics (e.g. invalid expressions, missing keys, type errors)
+- [ ] Support for more platforms (e.g. MAUI, WPF, etc.)
+- [ ] new keyword for creating objects
+- [ ] Aliases for >, <, etc. (e.g. `gt`, `lt`) instead of writing &amp;gt; in XAML
+- [ ] Pipe operator for chaining operations (e.g. `$A |# sqrt |# round`)
 
 ## Support
 

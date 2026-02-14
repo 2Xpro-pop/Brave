@@ -1,4 +1,7 @@
 using Avalonia.Controls;
+using AvaloniaEdit;
+using AvaloniaEdit.TextMate;
+using TextMateSharp.Grammars;
 
 namespace SampleGallery.Views;
 

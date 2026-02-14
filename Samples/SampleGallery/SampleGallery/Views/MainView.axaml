@@ -46,9 +46,6 @@
 				<TextBlock Text="{brave:RBinding '\'Counter is: \' + $Counter'}"/>
 				<Button Content="Increment"
 						Command="{brave:Execute Expression='$Counter++'}"/>
-
-				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $CounterView}" />
-
 			</StackPanel>
 		</Border>
 
@@ -65,7 +62,6 @@
 
 			<TextBlock Text="(Move the slider or edit the number)"/>
 
-			<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $TwoWayBindingView}" />
 		</StackPanel>
 
 		<StackPanel x:Key="$StepView" Spacing="12" Margin="16">
@@ -110,8 +106,6 @@
 						',
 						CanExecute='$Step &lt; 2'}" />
 			</StackPanel>
-
-			<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $StepView}" />
 		</StackPanel>
 
 		<StackPanel x:Key="$DetailsView"
@@ -127,8 +121,6 @@
 					IsVisible="{brave:RBinding $IsOpen}">
 				<TextBlock Text="Details..." />
 			</Border>
-
-			<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $DetailsView}" />
 		</StackPanel>
 
 		<Border x:Key="$ParameterSelfView" Padding="16">
@@ -153,8 +145,6 @@
 					<Button Content="Reset"
 							Command="{brave:Execute Expression='$Clicks = 0; $LastSender = null'}"/>
 				</StackPanel>
-
-				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $ParameterSelfView}" />
 
 			</StackPanel>
 		</Border>
@@ -182,9 +172,6 @@
 					<Button Content="Toggle IsOn" Command="{brave:Execute Expression='$IsOn = !$IsOn'}"/>
 					<Button Content="Reset" Command="{brave:Execute Expression='$A=7; $B=3; $Mask=5; $IsOn=true'}"/>
 				</StackPanel>
-
-				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $MathPlaygroundView}" />
-
 			</StackPanel>
 		</Border>
 
@@ -218,9 +205,6 @@
 					<Button Content="Clear"
 							Command="{brave:Execute Expression='$Name=null; $Age=null; $Note=null'}"/>
 				</StackPanel>
-
-				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $NullCoalesceView}" />
-
 			</StackPanel>
 		</Border>
 
@@ -260,9 +244,6 @@
 					<Button Content="Value += 25" Command="{brave:Execute Expression='$X = $X + 25'}"/>
 					<Button Content="Reset" Command="{brave:Execute Expression='$X=-12; $Min=0; $Max=100'}"/>
 				</StackPanel>
-
-				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $FunctionsView}" />
-
 			</StackPanel>
 		</Border>
 
@@ -288,9 +269,6 @@
 						CanExecute='($X &gt; 0 &amp;&amp; $Y &gt; 0) || $IsAdmin'}"/>
 
 				<TextBlock Text="{brave:RBinding '\'$Action: \' + ($Action ?? \'(null)\')'}"/>
-
-				<avaloniaedit:TextEditor Text="{samplegallery:XamlSource $CanExecuteView}" />
-
 			</StackPanel>
 		</Border>
 
@@ -383,9 +361,13 @@
 				<Border Height="{Binding #DrawerToogle.Bounds.Size.Height}"/>
 
 				<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Hidden">
-					<ContentPresenter Content="{DynamicResource $View}"/>
+
+					<StackPanel>
+						<ContentPresenter Content="{DynamicResource $View}"/>
+					</StackPanel>
+
 				</ScrollViewer>
-				
+
 			</Grid>
 
 		</SplitView>

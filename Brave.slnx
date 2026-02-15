@@ -20,7 +20,7 @@
     <File Path=".github/workflows/deploy-gh-pages.yml" />
     <File Path="README.md" />
   </Folder>
+  <Project Path="Brave/BraveCore.csproj" Id="ed6888eb-627d-436b-94d2-d54cacaa5f50" />
   <Project Path="D:/Repos/Brave/Brave.Avalonia/Brave.Avalonia.csproj" Id="27519af3-c444-44d9-aa93-cdb8c6c3de99" />
   <Project Path="D:/Repos/Brave/Brave.Tests/Brave.Tests.csproj" Id="edecb948-978d-446a-850e-83c485cf03b6" />
-  <Project Path="D:/Repos/Brave/Brave/Brave.csproj" Id="ed6888eb-627d-436b-94d2-d54cacaa5f50" />
 </Solution>

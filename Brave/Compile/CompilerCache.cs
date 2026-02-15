@@ -61,8 +61,9 @@ internal static class CompilerCache
         unchecked
         {
             var x = (uint)hash;
-            x ^= useDirectSetResource ? 0x9E3779B9u : 0u; 
+            x ^= useDirectSetResource ? 0x9E3779B9u : 0u;
 
+            // TODO: replace with something faster, because it's a lot of operations for a small cache. Maybe just a few rounds of mixing and remove multiplication?
             // MurmurHash3 fmix32 
             x ^= x >> 16;
             x *= 0x85EBCA6Bu;

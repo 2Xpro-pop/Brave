@@ -183,6 +183,7 @@ Brave expressions are intentionally small and focused.
 - [ ] new keyword for creating objects
 - [ ] Aliases for >, <, etc. (e.g. `gt`, `lt`) instead of writing &amp;gt; in XAML
 - [ ] Pipe operator for chaining operations (e.g. `$A |# sqrt |# round`)
+- [ ] Switch expression with `with` keyword
 
 ## Support
 

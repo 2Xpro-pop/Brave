@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Brave\Brave.csproj" />
+    <ProjectReference Include="..\Brave\BraveCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>
